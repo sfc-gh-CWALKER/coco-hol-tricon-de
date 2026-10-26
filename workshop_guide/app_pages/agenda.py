@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("Agenda")
-st.markdown("A 2.5-hour guided lab. Everyone does Part 1 and A1, then picks one more Part 2 workflow. The rest of Part 2 is material for the afternoon hackathon.")
+st.markdown("A 2.5-hour guided lab. Everyone does Part 1 and A1 hands-on, then the facilitator showcases every other Part 2 workflow live. Follow along if you like; any workflow can become your afternoon hackathon project.")
 
 st.space("small")
 
@@ -11,9 +11,10 @@ LAB_PATH = [
     ("9:40", "Part 1, Modules 1 to 3", "60 min"),
     ("10:40", "Short break", "10 min"),
     ("10:50", "A1 dbt upkeep: triage the failing test, propose a fix, approve, rerun", "20 min"),
-    ("11:10", "Part 1, Module 4: plugin sharing and automated PR review", "15 min"),
-    ("11:25", "One workflow of choice: A2, A4, or A6", "25 min"),
-    ("11:50", "Recap and bridge to the afternoon hackathon", "10 min"),
+    ("11:10", "Part 1, Module 4: plugin sharing and automated PR review", "10 min"),
+    ("11:20", "Part 2 showcase (live demo): A2, A3, A4, A5, A6", "30 min"),
+    ("11:50", "A7: putting these workflows on a schedule (demo)", "5 min"),
+    ("11:55", "Recap; teams pick hackathon topics", "5 min"),
 ]
 with st.container(border=True):
     for time, title, dur in LAB_PATH:
@@ -40,7 +41,7 @@ with st.container(border=True):
 
 st.space("medium")
 
-st.markdown("#### Part 2: Automating Tricon's workflows (A1 for everyone, then pick one)")
+st.markdown("#### Part 2: Automating Tricon's workflows (A1 hands-on, the rest showcased live)")
 st.markdown("These are the tasks Tricon asked to automate, grouped the same way.")
 
 PART2 = [
