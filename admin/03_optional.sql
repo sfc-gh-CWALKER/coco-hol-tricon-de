@@ -1,5 +1,5 @@
 -- =====================================================================
--- STEP 3 of 5 - OPTIONAL EXTRAS (each block is independent; skip any or all)
+-- OPTIONAL EXTRAS - run AFTER tricon_de_lab_setup.sql, only if you want them (each block is independent; skip any or all)
 -- =====================================================================
 
 -- 3a. Reviewer role for modules A3 (access review) and A6 (warehouse right-sizing) ---------
@@ -7,7 +7,7 @@
 -- Grant only to Snowflake admins / security owners. Skipping it only skips A3 and A6 (facilitator demos them).
 USE ROLE USERADMIN;
 CREATE ROLE IF NOT EXISTS TRICON_DE_REVIEWER
-  COMMENT = 'TEMPORARY - read-only account metadata for Tricon CoCo DE lab A3/A6. Remove with admin/99_teardown.sql';
+  COMMENT = 'TEMPORARY - Tricon CoCo DE lab: read-only account metadata for A3/A6. Remove with admin/99_teardown.sql';
 GRANT ROLE TRICON_DE_REVIEWER TO ROLE SECURITYADMIN;
 USE ROLE ACCOUNTADMIN;
 GRANT DATABASE ROLE SNOWFLAKE.SECURITY_VIEWER   TO ROLE TRICON_DE_REVIEWER;  -- users, roles, grants, logins

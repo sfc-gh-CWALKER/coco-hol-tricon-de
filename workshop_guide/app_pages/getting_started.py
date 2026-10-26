@@ -86,3 +86,16 @@ with st.container(border=True):
     render_code("dbt debug --project-dir dbt/")
     st.markdown("You should see `All checks passed!`. Then seed the synthetic data used later in Module A2:")
     render_code("dbt seed --project-dir dbt/")
+
+st.space("small")
+
+st.markdown("#### Step 6: Ask CoCo to check your lab area")
+with st.container(border=True):
+    st.markdown("Your admin pre-created your personal schema. Paste this into the CoCo Desktop chat to confirm everything works:")
+    render_code("""Check my lab setup. Use role TRICON_DE_ROLE and warehouse TRICON_DE_WH, and run these one at a time:
+1. SELECT CURRENT_USER(), CURRENT_ROLE(), CURRENT_WAREHOUSE();
+2. SHOW SCHEMAS LIKE 'DBT_<INITIALS>' IN DATABASE TRICON_DE;
+3. SELECT COUNT(*) FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS;   -- expect 1500000
+4. SELECT COUNT(*) FROM TRICON_DE.DBT_<INITIALS>.RESIDENT_CONTACTS;   -- expect 40 after dbt seed
+Give me a PASS/FAIL table. Do not create, change, or drop anything.""", language="text")
+    st.caption("Any FAIL? Send the table to your admin. Common fixes are in the admin guide's Troubleshooting section.")

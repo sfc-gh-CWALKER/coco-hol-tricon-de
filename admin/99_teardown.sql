@@ -23,5 +23,5 @@ DROP ROLE             IF EXISTS TRICON_DE_ROLE;       -- also removes it from al
 -- SNOWFLAKE_SAMPLE_DATA: keep it (it is Snowflake's standard sample share). Only if it was created for this lab:
 -- DROP DATABASE IF EXISTS SNOWFLAKE_SAMPLE_DATA;
 
--- If you set per-user CoCo Desktop credit limits in 04_attendees.sql, unset them:
+-- If you set per-user CoCo Desktop credit limits (ADMIN_GUIDE troubleshooting), unset them:
 -- ALTER USER "<USERNAME_1>" UNSET CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER;

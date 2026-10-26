@@ -25,7 +25,7 @@ Open the lab guide app and follow **Getting Started**. In short: install CoCo De
 
 ## For the admin
 
-Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (scripts `01_preflight` → `05_verify`, teardown `99_teardown`). It creates:
+Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (one script: `tricon_de_lab_setup.sql`, then `05_verify.sql`; teardown `99_teardown.sql`). It creates:
 
 | Object | Purpose |
 |--------|---------|
