@@ -33,7 +33,7 @@
 --       Find it in Snowsight > Governance & security > Users & Roles > Users, NAME column (not the email).
 --
 --    B) "NEW" - the person has no Snowflake user. The script creates a temporary lab login TRICON_DE_<INITIALS>
---       (person type, starts with LAB_TEMP_PASSWORD below, must change it and set up MFA at first login,
+--       (person type, lab role only - no secondary roles, starts with LAB_TEMP_PASSWORD below, must change it and set up MFA at first login,
 --       expires in 30 days). The final result lists every username, password and login URL.
 --         {"user": "NEW", "initials": "KL", "email": "kim.lee@triconresidential.com"}
 --
@@ -239,7 +239,7 @@ BEGIN
         EXECUTE IMMEDIATE 'CREATE USER ' || login ||
           ' TYPE = PERSON PASSWORD = ''' || temp_pwd || ''' MUST_CHANGE_PASSWORD = TRUE' ||
           ' DAYS_TO_EXPIRY = 30' ||
-          ' DEFAULT_ROLE = TRICON_DE_ROLE DEFAULT_WAREHOUSE = TRICON_DE_WH DEFAULT_NAMESPACE = ''' || sch || '''' ||
+          ' DEFAULT_ROLE = TRICON_DE_ROLE DEFAULT_SECONDARY_ROLES = () DEFAULT_WAREHOUSE = TRICON_DE_WH DEFAULT_NAMESPACE = ''' || sch || '''' ||
           IFF(r.email IS NULL, '', ' EMAIL = ''' || REPLACE(r.email, '''', '') || '''') ||
           ' COMMENT = ''TEMPORARY - Tricon CoCo DE lab login for initials ' || r.initials || ' (expires after 30 days). Remove with admin/99_teardown.sql''';
         login_type := 'B) new lab login';
@@ -260,6 +260,9 @@ BEGIN
         pwd := temp_pwd;
       ELSE
         login_type := 'B) lab login (already signed in - uses the password they chose)';
+      END IF;
+      IF (exists_already) THEN   -- keep lab logins scoped to the lab role only (older runs did not set this)
+        EXECUTE IMMEDIATE 'ALTER USER ' || login || ' SET DEFAULT_SECONDARY_ROLES = ()';
       END IF;
     ELSE
       login := NULL;

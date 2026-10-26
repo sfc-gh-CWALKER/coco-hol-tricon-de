@@ -154,6 +154,25 @@ Ask everyone to complete **Getting Started** in the lab guide before lab day: in
 
 ---
 
+## What attendees can see (and why it may look like more)
+
+The lab role (`TRICON_DE_ROLE`) is granted **only**:
+- `TRICON_DE` (usage, plus their own schema)
+- the read-only `SNOWFLAKE_SAMPLE_DATA`
+- the `TRICON_DE_WH` warehouse
+- `SNOWFLAKE.CORTEX_USER`
+
+You can confirm this with `SHOW GRANTS TO ROLE TRICON_DE_ROLE;`.
+
+If a tester sees *more* databases while using the lab role, there are two normal Snowflake reasons:
+
+1. **Secondary roles (most common).** Users default to `DEFAULT_SECONDARY_ROLES = ('ALL')`, so a session with `TRICON_DE_ROLE` selected still has the user's *other* roles active. For an admin testing the lab, that includes ACCOUNTADMIN. Test with a lab login, or run `USE SECONDARY ROLES NONE;` first.
+   - The **temporary lab logins** (`TRICON_DE_<INITIALS>`) are created with `DEFAULT_SECONDARY_ROLES = ()`, so they only ever have the lab role.
+   - **Existing users (option A)** keep their normal access. The script never changes their settings, and the lab adds nothing beyond the lab objects.
+2. **The PUBLIC role.** Every role automatically inherits `PUBLIC`. Anything your account has granted to `PUBLIC` is visible to everyone, including lab logins. That typically means shared Marketplace or listing databases (shown as `IMPORTED DATABASE`) and any databases granted to PUBLIC. Check with `SHOW GRANTS TO ROLE PUBLIC;`. The lab doesn't change PUBLIC. Review it with your security team if that's unexpected.
+
+---
+
 ## Optional extras (`03_optional.sql`): skip if unsure
 
 The core lab doesn't need any of these.
