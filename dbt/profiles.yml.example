@@ -1,0 +1,16 @@
+# Copy the tricon_de block into ~/.dbt/profiles.yml and replace the placeholders.
+# Uses your normal Tricon SSO login (browser pop-up) - no password or PAT stored.
+tricon_de:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "<TRICON_ACCOUNT_IDENTIFIER>"
+      user: "<YOUR_SNOWFLAKE_USERNAME>"
+      authenticator: externalbrowser
+      role: TRICON_DE_ROLE
+      database: TRICON_DE
+      warehouse: TRICON_DE_WH
+      schema: DBT_<INITIALS>
+      threads: 4
+      client_session_keep_alive: false

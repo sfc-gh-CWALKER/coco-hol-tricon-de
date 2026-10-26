@@ -1,0 +1,9 @@
+{
+  "name": "tricon-de",
+  "description": "Tricon data engineering standards and operations automations",
+  "version": "1.0.0",
+  "author": { "name": "Tricon Data Engineering" },
+  "skills": ["./skills"],
+  "agents": ["./agents"],
+  "hooks": "./hooks/hooks.json"
+}
