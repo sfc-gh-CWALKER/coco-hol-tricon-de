@@ -1,6 +1,13 @@
+import importlib
 from pathlib import Path
 
 import streamlit as st
+
+import components
+
+# Streamlit Cloud hot-reloads this file on each push but keeps imported modules cached;
+# reload so pages never see an older components.py than this file expects.
+importlib.reload(components)
 
 from components import (
     LOGIN_TEMP,
