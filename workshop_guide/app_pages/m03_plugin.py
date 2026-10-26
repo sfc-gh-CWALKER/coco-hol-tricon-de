@@ -158,7 +158,7 @@ Then rerun Prompt 3.5.
 
 render_key_concepts([
     {"term": "Why hooks matter", "definition": "Agents generate content dynamically, and that non-determinism doesn't belong in a production pipeline. A hook enforces the boundary no matter what the agent decides."},
-    {"term": "Hooks are one layer, not the only one", "definition": "This hook only checks shell commands. The real backstop is the lab role, which can't write outside your own schema. Use hooks *and* least-privilege roles."},
+    {"term": "Hooks are one layer, not the only one", "definition": "This hook only checks shell commands. The real backstop is the lab role, which can't touch anything outside the TRICON_DE database. (All attendees share one role, so it can still write to other attendees' DBT_* schemas; AGENTS.md is what keeps CoCo in yours. In production you'd use a role per schema.) Use hooks *and* least-privilege roles."},
     {"term": "Skill vs. subagent", "definition": "A skill guides an interactive session. A subagent runs to completion on its own, which makes it the right shape for CI and scheduled automations."},
 ])
 

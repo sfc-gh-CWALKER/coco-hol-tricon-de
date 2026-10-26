@@ -25,6 +25,7 @@ PROMPT_1_1 = """Create an AGENTS.md file at the root of this project. Include:
 - The source data is TPCH_SF1 in SNOWFLAKE_SAMPLE_DATA; all raw tables must be referenced through _sources.yml
 - Feature branches should follow the pattern: feature/<description>
 - PRs are required before merging to main
+- Only create or change objects in TRICON_DE.DBT_<INITIALS>; never write to another attendee's DBT_* schema
 - Never run dbt against --target prod, and never change grants, masking policies, or warehouse settings without my explicit approval — write proposals to the proposals/ folder instead
 - Ignore the workshop_guide/ and solutions/ folders; they are lab materials, not project code
 - This project uses CoCo Desktop — do not use the `cortex` CLI command"""
@@ -54,6 +55,7 @@ Click **Keep** to accept the file. It should look roughly like this:
 - Raw tables only through _sources.yml (SNOWFLAKE_SAMPLE_DATA.TPCH_SF1)
 
 ## Safety
+- Only write to TRICON_DE.DBT_<INITIALS>; never touch other attendees' DBT_* schemas
 - Never use --target prod
 - Grants, masking policies, and warehouse changes need my approval; write proposals to proposals/
 
