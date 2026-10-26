@@ -57,6 +57,7 @@ page = st.navigation(
         ],
     },
     position="sidebar",
+    expanded=True,
 )
 
 page.run()
