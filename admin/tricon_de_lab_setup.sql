@@ -245,8 +245,18 @@ BEGIN
         login_type := 'B) new lab login';
         pwd := temp_pwd;
       ELSEIF (never_signed_in) THEN
-        EXECUTE IMMEDIATE 'ALTER USER ' || login || ' SET PASSWORD = ''' || temp_pwd || ''' MUST_CHANGE_PASSWORD = TRUE';
-        login_type := 'B) lab login (not signed in yet - temporary password re-applied)';
+        -- Re-apply the starting password. If Snowflake says PRIOR_USE, it already has this password - nothing to do.
+        BEGIN
+          EXECUTE IMMEDIATE 'ALTER USER ' || login || ' SET PASSWORD = ''' || temp_pwd || ''' MUST_CHANGE_PASSWORD = TRUE';
+          login_type := 'B) lab login (not signed in yet - starting password re-applied)';
+        EXCEPTION
+          WHEN OTHER THEN
+            IF (CONTAINS(SQLERRM, 'PRIOR_USE')) THEN
+              login_type := 'B) lab login (not signed in yet - already has the starting password)';
+            ELSE
+              RAISE;
+            END IF;
+        END;
         pwd := temp_pwd;
       ELSE
         login_type := 'B) lab login (already signed in - uses the password they chose)';
