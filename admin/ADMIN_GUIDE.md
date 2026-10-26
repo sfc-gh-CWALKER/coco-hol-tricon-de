@@ -24,7 +24,7 @@ The lab follows Snowflake's [Data Engineering with CoCo](https://www.snowflake.c
 - changes or drops any existing user, role, warehouse, database, or grant
 - changes attendees' default role, default warehouse, password, or MFA (it only *adds* the lab role)
 - changes account parameters, network policies, or authentication
-- creates passwords, tokens, or service users
+- creates tokens or service users. It creates a password **only** for people you mark `"NEW"`: a temporary login that must change its password and enroll in MFA, and that expires after 30 days
 - gives access to any Tricon data. Attendees work only with Snowflake's built-in TPC-H sample and a 40-row **synthetic** CSV with fake names and `@example.com` emails
 
 **Built-in safety checks.** The script stops before changing anything if:
@@ -38,18 +38,42 @@ The lab follows Snowflake's [Data Engineering with CoCo](https://www.snowflake.c
 
 ## Step 1: Fill in the attendee list
 
-Open `admin/tricon_de_lab_setup.sql` and edit **section 0 only**. Add one line per person, including yourself so you can test:
+Open `admin/tricon_de_lab_setup.sql` and edit **section 0 only**. Add one line per person, including yourself so you can test. You can mix the three login types below in one list:
 
 ```sql
 SET ATTENDEES = '[
-  {"user": "JSMITH", "initials": "JS"},
-  {"user": "APATEL", "initials": "AP"},
-  {"user": "YOURNAME", "initials": "YN"}
+  {"user": "JSMITH", "initials": "JS"},                                   -- A) existing user (recommended)
+  {"user": "NEW",    "initials": "KL", "email": "kim.lee@triconresidential.com"},  -- B) no Snowflake user yet
+  {"user": "YOURNAME", "initials": "YN"}                                  -- you, to test
 ]';
 ```
 
-- `user` is the **NAME** column in Snowsight → Admin → Users & Roles → Users, not the email address.
+- `user` is the **NAME** column in Snowsight → **Governance & security → Users & Roles → Users**, not the email address. You can also use `"NEW"` (see below).
 - `initials` must be 2–4 letters or digits and unique. Each person's area becomes `TRICON_DE.DBT_<initials>`.
+- `email` is optional and only used for `"NEW"` logins.
+
+### Choosing how attendees log in
+
+Every option gives each person **their own schema**. They differ only in which Snowflake login the person uses.
+
+| Option | Write in `user` | Who it's for | Login experience | Recommendation |
+|---|---|---|---|---|
+| **A) Existing user** | Their user NAME | Anyone with a Snowflake login today | Exactly as today (e.g. Tricon SSO). dbt uses `authenticator: externalbrowser` | **Use this whenever possible** |
+| **B) Temporary lab login** | `"NEW"` | People with no Snowflake user (contractors, new joiners, India team members not yet provisioned) | Script creates `TRICON_DE_<INITIALS>` with a **one-time password**. The person must change it **and enroll in MFA** at first login. **Auto-expires after 30 days** | Good fallback. Send each password privately (not in a group chat) |
+| **C) Shared login** | The same user for several people (e.g. `"NEW"` with initials `LAB`, then `"TRICON_DE_LAB"` for the others) | Last resort when individual logins aren't possible | Everyone signs in as one user; each still uses their own initials and schema | **Not recommended** (see below) |
+
+**Why a shared login is a last resort:**
+- **MFA:** Snowflake requires MFA for password logins by human users, and only one phone can be enrolled. Everyone would need that person's MFA prompt.
+- **No accountability:** query history shows one user for everyone.
+- **Shared CoCo state:** CoCo's per-user items (memory, the published plugin in Module 4, `USER$<name>` objects) would collide.
+- **Option B instead:** a shared login isn't any faster to set up than giving each person a temporary login.
+
+**About temporary logins (B):**
+- Created as `TYPE = PERSON` with `MUST_CHANGE_PASSWORD = TRUE`, `DAYS_TO_EXPIRY = 30`, and `DEFAULT_ROLE`, warehouse and schema already set to the lab objects.
+- The password is shown **once**, in the final result table. Copy it, or use the download button, before closing the worksheet. It isn't stored anywhere.
+- Re-running the script never resets an existing temporary login's password. To reset one, drop that user and re-run.
+- If Tricon enforces SSO-only sign-in through an authentication policy, password logins may be blocked. In that case, provision the person through Tricon's identity provider and use option A.
+- `99_teardown.sql` removes these logins. Real users are never dropped.
 
 ---
 
@@ -104,16 +128,20 @@ Grant yourself the lab by including your own user in section 0, then run `05_ver
 
 ## Step 4: Send each attendee their row from the summary table
 
-Each attendee needs four values (the summary table lists them):
+Each attendee needs these values from the summary table:
 
 | Where | Value |
 |---|---|
+| Snowflake login | `snowflake_login` column (option A: their usual login) |
+| One-time password (B only) | `one_time_password` column. **Send privately; it's shown only once** |
 | CoCo Desktop connection: account | `account_identifier` column |
 | CoCo Desktop: role / warehouse | `TRICON_DE_ROLE` / `TRICON_DE_WH` |
 | Lab guide app sidebar: initials | `initials_for_lab_app` column |
 | dbt profile: schema | `personal_schema` column (without the `TRICON_DE.` prefix) |
 
-Also send them the lab guide link and ask them to complete **Getting Started** before lab day: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, which usually need IT approval. They sign in with their **normal Tricon SSO login**. Nothing is stored and no token is created.
+Also send them the lab guide link and ask them to complete **Getting Started** before lab day: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, which usually need IT approval.
+- **Option A** attendees sign in with their normal Tricon login (e.g. SSO). Nothing is stored and no token is created.
+- **Option B/C** attendees sign in to Snowsight first with the one-time password, set a new password, and enroll in MFA. Then they use that login in CoCo Desktop. The Getting Started page has the dbt profile for password logins.
 
 **Adding people later:** add them to section 0 and click Run All again. Existing attendees aren't affected.
 
@@ -150,7 +178,9 @@ Similarly named objects (for example `TRICON_DEMO`) are never touched. `SNOWFLAK
 |---|---|
 | `STOP: existing ... was not created by this lab` | Something named `TRICON_DE*` already exists. Don't continue; contact the facilitator |
 | `STOP: CORTEX_ENABLED_CROSS_REGION is DISABLED` | CoCo Desktop requires cross-region inference ([docs](https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-desktop)). Decide with your security team; the script never changes it |
-| `STOP: fix the attendee list ... user not found` | Use the NAME column from Admin → Users & Roles, not the email |
+| `STOP: fix the attendee list ... user not found` | Use the NAME column from Governance & security → Users & Roles, not the email. Or use `"NEW"` for people without a Snowflake user |
+| Temporary-login (B) attendee can't sign in | They must change the one-time password and enroll in MFA on first login. If it's lost, drop the user (`DROP USER TRICON_DE_<INI>;`) and re-run the script to get a new password |
+| Password login blocked for B/C users | Your account may only allow SSO through an authentication policy. Use option A (provision them in your identity provider) |
 | Attendee can't pick `TRICON_DE_ROLE` in CoCo Desktop | Confirm their summary row says READY; have them sign out and back in |
 | CoCo Desktop says access is blocked | `CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER` may be `0` in your account. Allow attendees: `ALTER USER "<name>" SET CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER = 20;` |
 | `unknown model` in `05_verify.sql` | Pick any GA model from `SHOW CORTEX BASE MODELS IN SCHEMA SNOWFLAKE.MODELS` |

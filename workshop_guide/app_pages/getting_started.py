@@ -41,11 +41,20 @@ st.space("small")
 st.markdown("#### Step 3: Connect CoCo Desktop")
 with st.container(border=True):
     st.markdown("""
-Add a Snowflake connection in CoCo Desktop using your normal Tricon Snowflake login.
+Your admin sent you a row from the setup summary. Your **login type** tells you how to sign in:
+
+| Login type | How you sign in |
+|---|---|
+| **A) existing user** | Your normal Tricon Snowflake login (e.g. SSO). Nothing new to set up |
+| **B) temporary lab login** (`TRICON_DE_<INITIALS>`) | **First**, sign in to Snowsight with the one-time password. Set a new password and enroll in MFA when prompted. Then use that login below |
+| **C) shared lab login** | Same as B, with the shared login. Agree who holds the MFA device |
+
+Add a Snowflake connection in CoCo Desktop with these values:
 
 | Setting | Value |
 |---------|-------|
-| **Account** | Tricon's account identifier (from your admin) |
+| **Account** | `account_identifier` from your admin |
+| **User** | `snowflake_login` from your admin |
 | **Role** | `TRICON_DE_ROLE` |
 | **Warehouse** | `TRICON_DE_WH` |
 | **Database** | `TRICON_DE` |
@@ -77,6 +86,25 @@ cp dbt/profiles.yml.example ~/.dbt/profiles.yml   # or merge the tricon_de block
       schema: DBT_<INITIALS>
       threads: 4""", language="yaml")
     st.info(":material/lock: **No password or token is stored.** `authenticator: externalbrowser` signs you in with Tricon SSO in a browser pop-up. The original guide uses a Personal Access Token plus a temporary network-policy bypass; we don't do that on a customer account.")
+    with st.expander("Login type B or C (temporary or shared lab login)? Use this profile instead"):
+        st.markdown("`externalbrowser` only works with SSO. For a password login, read the password from an environment variable so it's never written in a file, and approve the MFA prompt when dbt connects:")
+        render_code("""tricon_de:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "<TRICON_ACCOUNT_IDENTIFIER>"
+      user: "TRICON_DE_<INITIALS>"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      authenticator: username_password_mfa
+      role: TRICON_DE_ROLE
+      database: TRICON_DE
+      warehouse: TRICON_DE_WH
+      schema: DBT_<INITIALS>
+      threads: 4""", language="yaml")
+        render_code("""export SNOWFLAKE_PASSWORD='<your new password>'    # macOS/Linux, current terminal only
+# Windows PowerShell:  $env:SNOWFLAKE_PASSWORD='<your new password>'""")
+        st.caption("If the MFA prompt doesn't work from dbt, ask the facilitator. Everything else in the lab works from CoCo Desktop.")
 
 st.space("small")
 

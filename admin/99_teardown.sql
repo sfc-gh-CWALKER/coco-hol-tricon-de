@@ -1,27 +1,42 @@
 -- =====================================================================
 -- TEARDOWN - remove everything the lab created. Run after hackathon week.
--- Drops ONLY objects named TRICON_DE*. Safe to run even if some optional objects were never created.
+-- Snowsight worksheet as ACCOUNTADMIN, "Run All".
+-- Drops ONLY objects with the exact lab names, and ONLY temporary lab users whose comment
+-- starts with "TEMPORARY - Tricon CoCo DE lab". Existing (real) users are never dropped -
+-- they simply lose the lab role when it is dropped.
 -- =====================================================================
 USE ROLE ACCOUNTADMIN;
 
--- Review first: what will be removed
-SHOW DATABASES         LIKE 'TRICON\\_DE';
-SHOW WAREHOUSES        LIKE 'TRICON\\_DE\\_%';
-SHOW ROLES             LIKE 'TRICON\\_DE\\_%';
-SHOW RESOURCE MONITORS LIKE 'TRICON\\_DE\\_%';
-SHOW INTEGRATIONS      LIKE 'TRICON\\_DE\\_%';
--- Only the exact names below are dropped; similarly named objects (e.g. TRICON_DEMO) are never touched.
+-- 1. Temporary lab logins created with "NEW" (TRICON_DE_<INITIALS>)
+DECLARE
+  rs RESULTSET;
+  dropped STRING DEFAULT '';
+BEGIN
+  rs := (SHOW USERS LIKE 'TRICON\\_DE\\_%');
+  FOR u IN rs DO
+    IF (COALESCE(u."comment", '') ILIKE 'TEMPORARY - Tricon CoCo DE lab%') THEN
+      EXECUTE IMMEDIATE 'DROP USER IF EXISTS "' || REPLACE(u."name", '"', '""') || '"';
+      dropped := dropped || u."name" || ' ';
+    END IF;
+  END FOR;
+  RETURN 'Temporary lab users dropped: ' || IFF(dropped = '', '(none)', dropped);
+END;
 
-DROP DATABASE         IF EXISTS TRICON_DE;     -- all attendee DBT_<INITIALS> schemas, tables, semantic views, policies
+-- 2. Lab objects (exact names only; similarly named objects such as TRICON_DEMO are never touched)
+DROP DATABASE         IF EXISTS TRICON_DE;     -- all personal DBT_<INITIALS> schemas, tables, semantic views, policies
 DROP WAREHOUSE        IF EXISTS TRICON_DE_WH;
 DROP WAREHOUSE        IF EXISTS TRICON_DE_ADAPTIVE_DEMO_WH;
 DROP RESOURCE MONITOR IF EXISTS TRICON_DE_MONITOR;
 DROP INTEGRATION      IF EXISTS TRICON_DE_EMAIL_INT;
 DROP ROLE             IF EXISTS TRICON_DE_REVIEWER;   -- also removes it from any users
-DROP ROLE             IF EXISTS TRICON_DE_ROLE;       -- also removes it from all attendees
+DROP ROLE             IF EXISTS TRICON_DE_ROLE;       -- also removes it from every attendee
 
--- SNOWFLAKE_SAMPLE_DATA: keep it (it is Snowflake's standard sample share). Only if it was created for this lab:
+-- 3. Confirm - every line below should return 0 rows
+SHOW DATABASES         LIKE 'TRICON\\_DE';
+SHOW WAREHOUSES        LIKE 'TRICON\\_DE\\_%';
+SHOW ROLES             LIKE 'TRICON\\_DE\\_%';
+SHOW RESOURCE MONITORS LIKE 'TRICON\\_DE\\_%';
+SHOW USERS             LIKE 'TRICON\\_DE\\_%';
+
+-- SNOWFLAKE_SAMPLE_DATA is kept (Snowflake's standard sample share). Only if it was created for this lab:
 -- DROP DATABASE IF EXISTS SNOWFLAKE_SAMPLE_DATA;
-
--- If you set per-user CoCo Desktop credit limits (ADMIN_GUIDE troubleshooting), unset them:
--- ALTER USER "<USERNAME_1>" UNSET CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER;
