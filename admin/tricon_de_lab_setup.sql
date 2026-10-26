@@ -139,7 +139,7 @@ BEGIN
     UNION ALL SELECT 'duplicate initials: ' || initials FROM a GROUP BY initials HAVING COUNT(*) > 1
     UNION ALL SELECT 'email does not look valid: ' || email FROM a WHERE email IS NOT NULL AND NOT REGEXP_LIKE(email, '[^@ ]+@[^@ ]+\\.[^@ ]+')
     UNION ALL SELECT 'user is disabled: ' || user_name FROM a WHERE ARRAY_CONTAINS(user_name::VARIANT, PARSE_JSON(:disabled_json))
-    UNION ALL SELECT 'user not found (use the NAME column, or "NEW"): ' || user_name FROM a
+    UNION ALL SELECT 'user ' || user_name || ' does not exist in this account - if this person has no Snowflake user, change that line to {"user": "NEW", "initials": "' || initials || '"} to create a temporary lab login' FROM a
       WHERE user_name <> 'NEW'
         AND NOT ARRAY_CONTAINS(user_name::VARIANT, PARSE_JSON(:enabled_json))
         AND NOT ARRAY_CONTAINS(user_name::VARIANT, PARSE_JSON(:disabled_json))
