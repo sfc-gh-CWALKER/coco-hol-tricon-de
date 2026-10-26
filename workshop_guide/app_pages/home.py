@@ -19,17 +19,19 @@ with st.container(border=True):
 
 **Part 1** follows Jeremiah Hansen's Snowflake guide, [Data Engineering with CoCo](https://www.snowflake.com/en/developers/guides/data-engineering-with-coco/). You encode team standards in an `AGENTS.md`, a custom skill, and a plugin with a production-safety hook and a dbt review subagent, then run that same subagent in CI/CD.
 
-**Part 2** reuses the same pattern for the operations work Tricon wants to automate:
+**Part 2** reuses the same pattern for the tasks Tricon asked to automate:
 
 | Area | Workflow | Module |
 |------|----------|--------|
 | Data engineering | dbt project upkeep: run `dbt build`, triage failing tests, draft simple fixes | A1 |
-| Data quality & governance | Sensitive data classification sweep with tag and masking proposals | A2 |
-| Data quality & governance | Monthly access review: excess privileges, dormant users, orphaned roles | A3 |
-| Analytics & reporting | Recurring KPI report from a semantic view, published as HTML or email | A4 |
-| Analytics & reporting | Anomaly explanation: when a metric moves more than X%, find the driver | A5 |
-| Cost & performance | Warehouse right-sizing and Adaptive Warehouse evaluation | A6 |
+| Data quality and governance | Sensitive data classification sweep, with masking and tagging proposals routed for approval | A2 |
+| Data quality and governance | Monthly access review: excess privileges, dormant users, orphaned roles | A3 |
+| Analytics and business reporting | Recurring KPI reports from a semantic view, published as HTML or email | A4 |
+| Analytics and business reporting | Anomaly explanation: when a metric moves more than X%, find the driver | A5 |
+| Cost and performance | Warehouse right-sizing and/or Adaptive Warehouses | A6 |
 | All | Putting these workflows on a schedule | A7 |
+
+**Speakers:** Jeremiah Hansen (Snowflake), author of the Data Engineering with CoCo guide, and Johnathan, Financial & Retail SME.
 """)
 
 st.space("small")
