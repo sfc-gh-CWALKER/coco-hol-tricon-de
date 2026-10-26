@@ -8,7 +8,7 @@ st.space("small")
 col1, col2, col3 = st.columns(3)
 col1.metric("Modules", "4 + 7", help="4 core engineering modules plus 7 automation workflows")
 col2.metric("Prompts", "28", help="Cortex Code prompts across all modules")
-col3.metric("Core path", "~75 min", help="Part 1 plus one or two Part 2 workflows")
+col3.metric("Lab time", "2.5 hrs", help="Part 1, A1, and one more Part 2 workflow")
 
 st.space("medium")
 

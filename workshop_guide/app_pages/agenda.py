@@ -1,9 +1,28 @@
 import streamlit as st
 
 st.title("Agenda")
-st.markdown("Self-paced. Everyone does Part 1, then picks the Part 2 workflows that fit their role.")
+st.markdown("A 2.5-hour guided lab. Everyone does Part 1 and A1, then picks one more Part 2 workflow. The rest of Part 2 is material for the afternoon hackathon.")
 
 st.space("small")
+
+st.markdown("#### Lab run order (9:30 AM to 12:00 PM PST, tentative)")
+LAB_PATH = [
+    ("9:30", "Intro and setup check", "10 min"),
+    ("9:40", "Part 1, Modules 1 to 3", "60 min"),
+    ("10:40", "Short break", "10 min"),
+    ("10:50", "A1 dbt upkeep: triage the failing test, propose a fix, approve, rerun", "20 min"),
+    ("11:10", "Part 1, Module 4: plugin sharing and automated PR review", "15 min"),
+    ("11:25", "One workflow of choice: A2, A4, or A6", "25 min"),
+    ("11:50", "Recap and bridge to the afternoon hackathon", "10 min"),
+]
+with st.container(border=True):
+    for time, title, dur in LAB_PATH:
+        c1, c2 = st.columns([1, 6])
+        c1.markdown(f"**{time}**")
+        c2.markdown(f"{title} :gray-badge[{dur}]")
+st.caption("Finish the Getting Started readiness check before lab day; the plan has no time for installs.")
+
+st.space("medium")
 
 st.markdown("#### Part 1: Engineering standards (everyone, ~75 min)")
 st.markdown("Follows Jeremiah Hansen's guide. You build the pieces that every Part 2 workflow reuses.")
@@ -11,7 +30,7 @@ PART1 = [
     ("1", "Give CoCo your project context", "AGENTS.md and a conventions audit", "15 min"),
     ("2", "Turn a standard into a skill", "Schema tests, then a `new-dbt-model` skill", "20 min"),
     ("3", "Package it as a plugin", "Prod-safety hook and a `dbt-review` subagent", "25 min"),
-    ("4", "Share it and run it in CI", "Plugins Catalog and GitHub Actions", "15 min, optional"),
+    ("4", "Share it and run it in CI", "Plugins Catalog and GitHub Actions", "15 min"),
 ]
 with st.container(border=True):
     for key, title, detail, dur in PART1:
@@ -21,7 +40,7 @@ with st.container(border=True):
 
 st.space("medium")
 
-st.markdown("#### Part 2: Automating Tricon's workflows (pick by role, ~90 min)")
+st.markdown("#### Part 2: Automating Tricon's workflows (A1 for everyone, then pick one)")
 st.markdown("These are the tasks Tricon asked to automate, grouped the same way.")
 
 PART2 = [
