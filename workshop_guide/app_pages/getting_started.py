@@ -46,7 +46,7 @@ Your admin sent you a row from the setup summary. Your **login type** tells you 
 | Login type | How you sign in |
 |---|---|
 | **A) existing user** | Your normal Tricon Snowflake login (e.g. SSO). Nothing new to set up |
-| **B) temporary lab login** (`TRICON_DE_<INITIALS>`) | **First**, sign in to Snowsight with the one-time password. Set a new password and enroll in MFA when prompted. Then use that login below |
+| **B) temporary lab login** (`TRICON_DE_<INITIALS>`) | **First**, open the `login_url` your admin sent and sign in with your username and the starting password. Snowflake makes you choose **your own new password** and set up MFA. Do this before lab day. Then use that login below |
 | **C) shared lab login** | Same as B, with the shared login. Agree who holds the MFA device |
 
 Add a Snowflake connection in CoCo Desktop with these values:

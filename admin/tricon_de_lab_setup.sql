@@ -33,8 +33,8 @@
 --       Find it in Snowsight > Governance & security > Users & Roles > Users, NAME column (not the email).
 --
 --    B) "NEW" - the person has no Snowflake user. The script creates a temporary lab login TRICON_DE_<INITIALS>
---       (person type, one-time password, must change it and set up MFA at first login, expires in 30 days).
---       Passwords are shown ONCE in the final result - copy them before closing the worksheet.
+--       (person type, starts with LAB_TEMP_PASSWORD below, must change it and set up MFA at first login,
+--       expires in 30 days). The final result lists every username, password and login URL.
 --         {"user": "NEW", "initials": "KL", "email": "kim.lee@triconresidential.com"}
 --
 --    C) A shared login - several people use the SAME user, each with their own area (their initials).
@@ -50,6 +50,11 @@ SET ATTENDEES = '[
   {"user": "JSMITH", "initials": "JS"},
   {"user": "APATEL", "initials": "AP"}
 ]';
+
+--    Starting password for every "NEW" lab login (option B/C). Easy to share, but each person is FORCED
+--    to replace it (and set up MFA) the first time they sign in. Rules: at least 8 characters with an
+--    uppercase letter, a lowercase letter and a number. Change it if your password policy is stricter.
+SET LAB_TEMP_PASSWORD = 'TriconLab-2026';
 
 -- -------------------------------------------------------------------------------------
 -- 1. LAB WAREHOUSE FIRST (the safety checks below need a running warehouse)
@@ -115,6 +120,7 @@ DECLARE
   disabled_users ARRAY DEFAULT ARRAY_CONSTRUCT();
   enabled_json STRING;
   disabled_json STRING;
+  temp_pwd STRING;
 BEGIN
   users_rs := (SHOW USERS);
   FOR u IN users_rs DO
@@ -147,6 +153,12 @@ BEGIN
   );
   IF (COALESCE(problems, '') <> '') THEN
     EXECUTE IMMEDIATE 'SELECT TO_NUMBER(''STOP: fix the attendee list in section 0 - ' || REPLACE(problems, '''', '') || ''')';
+  END IF;
+  SELECT $LAB_TEMP_PASSWORD INTO :temp_pwd;
+  IF (NOT (LENGTH(temp_pwd) >= 8 AND REGEXP_LIKE(temp_pwd, '.*[A-Z].*')
+           AND REGEXP_LIKE(temp_pwd, '.*[a-z].*') AND REGEXP_LIKE(temp_pwd, '.*[0-9].*')
+           AND NOT CONTAINS(temp_pwd, ''''))) THEN
+    EXECUTE IMMEDIATE 'SELECT TO_NUMBER(''STOP: LAB_TEMP_PASSWORD in section 0 needs 8+ characters with an uppercase letter, a lowercase letter and a number (no quotes)'')';
   END IF;
   SELECT COUNT(*) INTO :n FROM TABLE(FLATTEN(INPUT => PARSE_JSON($ATTENDEES)));
   RETURN 'OK: attendee list valid (' || n || ' people)';
@@ -181,11 +193,13 @@ GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE TRICON_DE_ROLE;   -- required 
 -- -------------------------------------------------------------------------------------
 -- 4. ONE PERSONAL AREA PER ATTENDEE: TRICON_DE.DBT_<INITIALS>
 --    A) existing user: adds the lab role (their default role/warehouse/login are NOT changed)
---    B) "NEW": creates temporary login TRICON_DE_<INITIALS> (only if it does not exist yet)
+--    B) "NEW": creates lab login TRICON_DE_<INITIALS> with LAB_TEMP_PASSWORD (must be changed at first sign-in).
+--       On a re-run, a lab login that has never signed in gets LAB_TEMP_PASSWORD re-applied;
+--       one that has already signed in is left alone (it keeps the password its owner chose).
 --    C) shared login: same as A or B; each person still gets their own schema
 -- -------------------------------------------------------------------------------------
 CREATE OR REPLACE TEMPORARY TABLE TRICON_DE.PUBLIC.TRICON_DE_SETUP_RESULTS
-  (attendee STRING, login_user STRING, initials STRING, login_type STRING, one_time_password STRING);
+  (attendee STRING, login_user STRING, initials STRING, login_type STRING, temp_password STRING, first_steps STRING);
 
 DECLARE
   c CURSOR FOR
@@ -197,34 +211,45 @@ DECLARE
   login STRING;
   login_type STRING;
   pwd STRING;
+  steps STRING;
+  temp_pwd STRING;
   exists_already BOOLEAN;
+  never_signed_in BOOLEAN;
   sch STRING;
   ini STRING;
   req STRING;
   report STRING DEFAULT '';
 BEGIN
+  SELECT $LAB_TEMP_PASSWORD INTO :temp_pwd;
   FOR r IN c DO
     sch := 'TRICON_DE.DBT_' || r.initials;
     pwd := NULL;
     IF (r.user_name = 'NEW') THEN
       login := 'TRICON_DE_' || r.initials;
       exists_already := FALSE;
+      never_signed_in := TRUE;
       users_rs := (SHOW USERS LIKE 'TRICON\\_DE\\_%');
       FOR u IN users_rs DO
-        IF (UPPER(u."name") = login) THEN exists_already := TRUE; END IF;
+        IF (UPPER(u."name") = login) THEN
+          exists_already := TRUE;
+          never_signed_in := (u."last_success_login" IS NULL);
+        END IF;
       END FOR;
-      IF (exists_already) THEN
-        login_type := 'B) temporary lab login (already existed - password unchanged)';
-      ELSE
-        -- 14 random letters/digits + guaranteed upper, lower, digit and symbol
-        pwd := 'Tc' || RANDSTR(10, RANDOM()) || '7#' || LOWER(RANDSTR(2, RANDOM()));
+      IF (NOT exists_already) THEN
         EXECUTE IMMEDIATE 'CREATE USER ' || login ||
-          ' TYPE = PERSON PASSWORD = ''' || pwd || ''' MUST_CHANGE_PASSWORD = TRUE' ||
+          ' TYPE = PERSON PASSWORD = ''' || temp_pwd || ''' MUST_CHANGE_PASSWORD = TRUE' ||
           ' DAYS_TO_EXPIRY = 30' ||
           ' DEFAULT_ROLE = TRICON_DE_ROLE DEFAULT_WAREHOUSE = TRICON_DE_WH DEFAULT_NAMESPACE = ''' || sch || '''' ||
           IFF(r.email IS NULL, '', ' EMAIL = ''' || REPLACE(r.email, '''', '') || '''') ||
           ' COMMENT = ''TEMPORARY - Tricon CoCo DE lab login for initials ' || r.initials || ' (expires after 30 days). Remove with admin/99_teardown.sql''';
-        login_type := 'B) temporary lab login (new)';
+        login_type := 'B) new lab login';
+        pwd := temp_pwd;
+      ELSEIF (never_signed_in) THEN
+        EXECUTE IMMEDIATE 'ALTER USER ' || login || ' SET PASSWORD = ''' || temp_pwd || ''' MUST_CHANGE_PASSWORD = TRUE';
+        login_type := 'B) lab login (not signed in yet - temporary password re-applied)';
+        pwd := temp_pwd;
+      ELSE
+        login_type := 'B) lab login (already signed in - uses the password they chose)';
       END IF;
     ELSE
       login := NULL;
@@ -234,39 +259,46 @@ BEGIN
       END FOR;
       login_type := IFF(STARTSWITH(UPPER(login), 'TRICON_DE_'), 'C) shared lab login', 'A) existing user');
     END IF;
+    steps := IFF(pwd IS NOT NULL,
+        '1) Open the login URL  2) Username ' || login || ', password ' || COALESCE(pwd, '') ||
+        '  3) Choose your own new password when asked  4) Set up MFA when asked  5) Follow Getting Started in the lab app',
+      IFF(STARTSWITH(login_type, 'A)'),
+        'Sign in as you normally do (e.g. Tricon SSO), then follow Getting Started in the lab app',
+        'Sign in with username ' || login || ' and the password already chosen, then follow Getting Started in the lab app'));
     EXECUTE IMMEDIATE 'GRANT ROLE TRICON_DE_ROLE TO USER "' || REPLACE(login, '"', '""') || '"';
     EXECUTE IMMEDIATE 'CREATE SCHEMA IF NOT EXISTS ' || sch ||
       ' COMMENT = ''TEMPORARY - Tricon CoCo DE lab: personal area for ' || r.initials || ' (login ' || REPLACE(login, '''', '') || ')''';
     EXECUTE IMMEDIATE 'GRANT OWNERSHIP ON SCHEMA ' || sch || ' TO ROLE TRICON_DE_ROLE COPY CURRENT GRANTS';
     ini := r.initials;
     req := r.user_name;
-    INSERT INTO TRICON_DE.PUBLIC.TRICON_DE_SETUP_RESULTS VALUES (:req, :login, :ini, :login_type, :pwd);
+    INSERT INTO TRICON_DE.PUBLIC.TRICON_DE_SETUP_RESULTS VALUES (:req, :login, :ini, :login_type, :pwd, :steps);
     report := report || r.initials || ' -> ' || login || ' (' || login_type || '); ';
   END FOR;
   RETURN report;
 END;
 
 -- -------------------------------------------------------------------------------------
--- 5. SUMMARY - send each attendee their row.  !!! ONE_TIME_PASSWORD IS SHOWN ONLY NOW !!!
---    Copy it (or use the download button on the result) before closing this worksheet. It is not stored anywhere.
+-- 5. LAB USER LIST - send each attendee their row (download it with the button above the result).
 --    This must stay the LAST statement: Snowsight's Run All shows the last result.
 -- -------------------------------------------------------------------------------------
-SELECT r.initials                                                   AS initials_for_lab_app,
-       r.login_user                                                 AS snowflake_login,
+SELECT r.initials                                                              AS initials,
+       r.login_user                                                            AS username,
+       COALESCE(r.temp_password, '')                                           AS temporary_password,
+       'https://app.snowflake.com/' || LOWER(CURRENT_ORGANIZATION_NAME()) || '/' || LOWER(CURRENT_ACCOUNT_NAME())
+                                                                               AS login_url,
+       r.first_steps                                                           AS first_login_steps,
        r.login_type,
-       r.one_time_password,
-       'TRICON_DE.DBT_' || r.initials                               AS personal_schema,
-       'TRICON_DE_ROLE'                                             AS coco_desktop_role,
-       'TRICON_DE_WH'                                               AS coco_desktop_warehouse,
-       CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME() AS account_identifier,
-       IFF(s.schema_name IS NOT NULL, 'READY', 'MISSING')           AS status,
+       'TRICON_DE.DBT_' || r.initials                                          AS personal_schema,
+       'TRICON_DE_ROLE'                                                        AS coco_desktop_role,
+       'TRICON_DE_WH'                                                          AS coco_desktop_warehouse,
+       CURRENT_ORGANIZATION_NAME() || '-' || CURRENT_ACCOUNT_NAME()            AS account_identifier,
+       'https://coco-hol-tricon-de-gejm3sg47ufychnq9jpkqg.streamlit.app/'      AS lab_guide,
+       IFF(s.schema_name IS NOT NULL, 'READY', 'MISSING')                      AS status,
        IFF(COUNT(*) OVER (PARTITION BY r.login_user) > 1,
            'SHARED LOGIN (' || COUNT(*) OVER (PARTITION BY r.login_user) || ' people) - see ADMIN_GUIDE.md', '') AS note
 FROM TRICON_DE.PUBLIC.TRICON_DE_SETUP_RESULTS r
 LEFT JOIN TRICON_DE.INFORMATION_SCHEMA.SCHEMATA s ON s.schema_name = 'DBT_' || r.initials
-ORDER BY r.initials;
--- (The results table is TEMPORARY: it disappears when this worksheet session ends, so passwords never persist.)
+ORDER BY IFF(r.temp_password IS NOT NULL, 0, 1), r.initials;
 
--- EXPECT every row READY. Next: admin/05_verify.sql (2 minutes), then send attendees the lab link:
---   https://coco-hol-tricon-de-gejm3sg47ufychnq9jpkqg.streamlit.app/
+-- EXPECT every row READY. Next: admin/05_verify.sql (2 minutes), then send attendees their rows.
 -- Optional extras (reviewer role, email, Adaptive demo): admin/03_optional.sql

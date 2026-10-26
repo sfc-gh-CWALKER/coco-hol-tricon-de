@@ -46,11 +46,14 @@ SET ATTENDEES = '[
   {"user": "NEW",    "initials": "KL", "email": "kim.lee@triconresidential.com"},  -- B) no Snowflake user yet
   {"user": "YOURNAME", "initials": "YN"}                                  -- you, to test
 ]';
+
+SET LAB_TEMP_PASSWORD = 'TriconLab-2026';   -- starting password for every "NEW" login
 ```
 
 - `user` is the **NAME** column in Snowsight → **Governance & security → Users & Roles → Users**, not the email address. You can also use `"NEW"` (see below).
 - `initials` must be 2–4 letters or digits and unique. Each person's area becomes `TRICON_DE.DBT_<initials>`.
 - `email` is optional and only used for `"NEW"` logins.
+- `LAB_TEMP_PASSWORD` is the **same starting password for every new lab login**, so it's easy to share. It needs at least 8 characters with an uppercase letter, a lowercase letter, and a number. Change it to anything you like (or to match a stricter Tricon password policy).
 
 ### Choosing how attendees log in
 
@@ -59,7 +62,7 @@ Every option gives each person **their own schema**. They differ only in which S
 | Option | Write in `user` | Who it's for | Login experience | Recommendation |
 |---|---|---|---|---|
 | **A) Existing user** | Their user NAME | Anyone with a Snowflake login today | Exactly as today (e.g. Tricon SSO). dbt uses `authenticator: externalbrowser` | **Use this whenever possible** |
-| **B) Temporary lab login** | `"NEW"` | People with no Snowflake user (contractors, new joiners, India team members not yet provisioned) | Script creates `TRICON_DE_<INITIALS>` with a **one-time password**. The person must change it **and enroll in MFA** at first login. **Auto-expires after 30 days** | Good fallback. Send each password privately (not in a group chat) |
+| **B) Temporary lab login** | `"NEW"` | People with no Snowflake user (contractors, new joiners, India team members not yet provisioned) | Script creates `TRICON_DE_<INITIALS>` with the **shared starting password**. Snowflake **forces each person to replace it with their own** and enroll in MFA at first sign-in. **Auto-expires after 30 days** | Good fallback |
 | **C) Shared login** | The same user for several people (e.g. `"NEW"` with initials `LAB`, then `"TRICON_DE_LAB"` for the others) | Last resort when individual logins aren't possible | Everyone signs in as one user; each still uses their own initials and schema | **Not recommended** (see below) |
 
 **Why a shared login is a last resort:**
@@ -70,8 +73,9 @@ Every option gives each person **their own schema**. They differ only in which S
 
 **About temporary logins (B):**
 - Created as `TYPE = PERSON` with `MUST_CHANGE_PASSWORD = TRUE`, `DAYS_TO_EXPIRY = 30`, and `DEFAULT_ROLE`, warehouse and schema already set to the lab objects.
-- The password is shown **once**, in the final result table. Copy it, or use the download button, before closing the worksheet. It isn't stored anywhere.
-- Re-running the script never resets an existing temporary login's password. To reset one, drop that user and re-run.
+- Every new lab login starts with `LAB_TEMP_PASSWORD`. Because everyone starts with the same password, **send each person only their own username**, and ask them to sign in and change it **before lab day**. Until someone signs in, anyone who knows the shared password and their username could sign in first.
+- Re-running the script re-applies the starting password **only** to lab logins that have never signed in, which is handy if someone lost it. A lab login that has already signed in keeps the password its owner chose.
+- The final result table lists every username, starting password, and login URL, so you can download it and send each person their row.
 - If Tricon enforces SSO-only sign-in through an authentication policy, password logins may be blocked. In that case, provision the person through Tricon's identity provider and use option A.
 - `99_teardown.sql` removes these logins. Real users are never dropped.
 
@@ -126,22 +130,25 @@ Grant yourself the lab by including your own user in section 0, then run `05_ver
 
 ---
 
-## Step 4: Send each attendee their row from the summary table
+## Step 4: Send each attendee their row from the lab user list
 
-Each attendee needs these values from the summary table:
+The last result of the script is the **lab user list**, with one row per person; new lab logins are listed first. Use the download button above the result to save it as a CSV. Each row has:
 
-| Where | Value |
+| Column | What it's for |
 |---|---|
-| Snowflake login | `snowflake_login` column (option A: their usual login) |
-| One-time password (B only) | `one_time_password` column. **Send privately; it's shown only once** |
-| CoCo Desktop connection: account | `account_identifier` column |
-| CoCo Desktop: role / warehouse | `TRICON_DE_ROLE` / `TRICON_DE_WH` |
-| Lab guide app sidebar: initials | `initials_for_lab_app` column |
-| dbt profile: schema | `personal_schema` column (without the `TRICON_DE.` prefix) |
+| `username` | Their Snowflake login (option A: their usual login) |
+| `temporary_password` | B/C only: the starting password. They **must** change it at first sign-in |
+| `login_url` | The link they click to sign in to Snowflake (Snowsight) |
+| `first_login_steps` | Plain-English steps for that person |
+| `personal_schema` | Their own area. In the dbt profile, use it without the `TRICON_DE.` prefix |
+| `coco_desktop_role` / `coco_desktop_warehouse` | `TRICON_DE_ROLE` / `TRICON_DE_WH` |
+| `account_identifier` | For the CoCo Desktop connection and the dbt profile |
+| `lab_guide` | The lab guide app link |
+| `initials` | What they type in the lab app's sidebar |
 
-Also send them the lab guide link and ask them to complete **Getting Started** before lab day: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, which usually need IT approval.
+Ask everyone to complete **Getting Started** in the lab guide before lab day: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, which usually need IT approval.
 - **Option A** attendees sign in with their normal Tricon login (e.g. SSO). Nothing is stored and no token is created.
-- **Option B/C** attendees sign in to Snowsight first with the one-time password, set a new password, and enroll in MFA. Then they use that login in CoCo Desktop. The Getting Started page has the dbt profile for password logins.
+- **Option B/C** attendees open the `login_url` and sign in with their `username` and the starting password. Snowflake makes them choose their own password and set up MFA. Then they use that login in CoCo Desktop. The Getting Started page has the dbt profile for password logins.
 
 **Adding people later:** add them to section 0 and click Run All again. Existing attendees aren't affected.
 
@@ -179,7 +186,8 @@ Similarly named objects (for example `TRICON_DEMO`) are never touched. `SNOWFLAK
 | `STOP: existing ... was not created by this lab` | Something named `TRICON_DE*` already exists. Don't continue; contact the facilitator |
 | `STOP: CORTEX_ENABLED_CROSS_REGION is DISABLED` | CoCo Desktop requires cross-region inference ([docs](https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-desktop)). Decide with your security team; the script never changes it |
 | `STOP: fix the attendee list ... user not found` | Use the NAME column from Governance & security → Users & Roles, not the email. Or use `"NEW"` for people without a Snowflake user |
-| Temporary-login (B) attendee can't sign in | They must change the one-time password and enroll in MFA on first login. If it's lost, drop the user (`DROP USER TRICON_DE_<INI>;`) and re-run the script to get a new password |
+| Temporary-login (B) attendee can't sign in | They must replace the starting password and enroll in MFA at first sign-in. If they never signed in, re-run the script to re-apply the starting password. If they signed in and forgot their new password: `ALTER USER TRICON_DE_<INI> SET PASSWORD = 'TriconLab-2026' MUST_CHANGE_PASSWORD = TRUE;` |
+| Password rejected when the script creates a login | Tricon's password policy is stricter than the default. Change `LAB_TEMP_PASSWORD` in section 0 (longer, add a symbol) and re-run |
 | Password login blocked for B/C users | Your account may only allow SSO through an authentication policy. Use option A (provision them in your identity provider) |
 | Attendee can't pick `TRICON_DE_ROLE` in CoCo Desktop | Confirm their summary row says READY; have them sign out and back in |
 | CoCo Desktop says access is blocked | `CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER` may be `0` in your account. Allow attendees: `ALTER USER "<name>" SET CORTEX_CODE_DESKTOP_DAILY_EST_CREDIT_LIMIT_PER_USER = 20;` |
