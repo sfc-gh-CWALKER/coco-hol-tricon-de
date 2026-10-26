@@ -1,40 +1,9 @@
 import streamlit as st
 
 st.title("Agenda")
-st.markdown(
-    "A one-day workshop: talks in the morning, then hands-on labs. "
-    "The hands-on part is self-paced: everyone does Part 1, then picks the Part 2 workflows that fit their role."
-)
-st.caption(":material/schedule: Times are tentative and will be confirmed with Tricon.")
+st.markdown("Self-paced. Everyone does Part 1, then picks the Part 2 workflows that fit their role.")
 
 st.space("small")
-
-SCHEDULE = [
-    ("9:00", "Welcome and goals for the day", "Snowflake account team", None),
-    ("9:15", "Data Engineering with CoCo", "Jeremiah Hansen, Snowflake", "Keynote"),
-    ("10:00", "What's new from Snowflake Expedition", "Snowflake account team", "Talk"),
-    ("10:20", "Break", None, None),
-    ("10:30", "Hands-on Part 1: Engineering standards", "Everyone", "Lab"),
-    ("11:45", "Lunch", None, None),
-    ("12:30", "AI and data in financial services and retail", "Johnathan, Financial & Retail SME", "Talk"),
-    ("1:15", "Hands-on Part 2: Automating Tricon's workflows", "Pick by role", "Lab"),
-    ("2:45", "Break", None, None),
-    ("3:00", "Putting workflows on a schedule", "Everyone", "Discussion"),
-    ("3:30", "Tricon priorities, next steps, Q&A", "Tricon and Snowflake", None),
-    ("4:00", "Close", None, None),
-]
-
-with st.container(border=True):
-    for time, title, who, kind in SCHEDULE:
-        c1, c2 = st.columns([1, 6])
-        c1.markdown(f"**{time}**")
-        if who is None:
-            c2.markdown(f":gray[{title}]")
-        else:
-            badge = f" :blue-badge[{kind}]" if kind else ""
-            c2.markdown(f"**{title}**{badge}  \n:gray[{who}]")
-
-st.space("medium")
 
 st.markdown("#### Part 1: Engineering standards (everyone, ~75 min)")
 st.markdown("Follows Jeremiah Hansen's guide. You build the pieces that every Part 2 workflow reuses.")
