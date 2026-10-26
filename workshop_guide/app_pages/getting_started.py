@@ -9,7 +9,7 @@ st.space("small")
 
 render_guide_change(
     "Fork `Snowflake-Labs/sfguide-data-engineering-with-coco`, run `scripts/setup.sql` yourself (creates `DEMO_ROLE`/`DEMO_WH`/`DEMO_DB`), create a PAT, and bypass the network policy.",
-    "Clone `coco-hol-tricon-de` (same `dbt/` starter). Tricon's admin pre-provisions `TRICON_DE_*` via `admin/setup.sql`. dbt signs in with **SSO**, and each attendee gets their own `DBT_<INITIALS>` schema.",
+    "Clone `coco-hol-tricon-de` (same `dbt/` starter). Tricon's admin pre-provisions `TRICON_DE_*` via `admin/ADMIN_GUIDE.md`. dbt signs in with **SSO**, and each attendee gets their own `DBT_<INITIALS>` schema.",
     "Customer account: least privilege, no stored secrets, no network-policy changes, and no collisions between attendees.")
 
 st.markdown("#### Step 1: Install the tools")

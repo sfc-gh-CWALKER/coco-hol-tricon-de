@@ -16,7 +16,7 @@ Every Part 2 automation **proposes**; a person **approves**.
 │   ├── seeds/             # resident_contacts.csv - SYNTHETIC PII for the classification workflow
 │   └── profiles.yml.example   # SSO (externalbrowser) profile, per-attendee schema
 ├── solutions/tricon-de-plugin/   # Reference skills, subagents, hook, and manifest
-└── admin/                 # setup.sql / teardown.sql for Tricon's Snowflake admin
+└── admin/                 # ADMIN_GUIDE.md + numbered setup, verify and teardown scripts
 ```
 
 ## For attendees
@@ -25,7 +25,7 @@ Open the lab guide app and follow **Getting Started**. In short: install CoCo De
 
 ## For the admin
 
-Review and run `admin/setup.sql` before the lab. It creates:
+Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (scripts `01_preflight` → `05_verify`, teardown `99_teardown`). It creates:
 
 | Object | Purpose |
 |--------|---------|

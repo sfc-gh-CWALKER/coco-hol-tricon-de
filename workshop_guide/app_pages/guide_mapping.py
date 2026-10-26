@@ -13,7 +13,7 @@ st.markdown("""
 |---|---|---|
 | Overview / What is Cortex Code? | Home | Condensed |
 | Setup: fork & clone | Getting Started, Step 2 | :orange-badge[Adjusted] Clone `sfc-gh-cwalker/coco-hol-tricon-de` (fork only for CI/CD) |
-| Setup: run `scripts/setup.sql` | `admin/setup.sql`, run by Tricon's admin | :orange-badge[Adjusted] Pre-provisioned; attendees get no ownership or DDL rights |
+| Setup: run `scripts/setup.sql` | `admin/ADMIN_GUIDE.md` + scripts, run by Tricon's admin | :orange-badge[Adjusted] Pre-provisioned; attendees get no ownership or DDL rights |
 | Setup: create a PAT + network-policy bypass | — | :orange-badge[Adjusted] Removed; dbt uses SSO (`externalbrowser`) |
 | Setup: configure dbt / `dbt debug` | Getting Started, Steps 4–5 | :orange-badge[Adjusted] `tricon_de` profile, per-attendee schema, plus `dbt seed` |
 | Create an AGENTS.md | Module 1, Prompts 1.1–1.3 | :orange-badge[Adjusted] Prompt 1.1 adds two lines: safety rules, and ignore lab folders |

@@ -63,7 +63,7 @@ render_prompt("Prompt A6.3", "Evaluate COMPUTE_WH for Adaptive", PROMPT_A6_3)
 render_guardrail("Warehouse changes affect cost and every workload on the warehouse. The lab role can't run `ALTER WAREHOUSE`. The proposal goes to Tricon's Snowflake admin, who can run a one-week pilot with the rollback statement ready.")
 
 render_explanation("Facilitator demo (optional)", """
-If the admin set up `TRICON_DE_ADAPTIVE_DEMO_WH` (see `admin/setup.sql`), the facilitator can show the conversion live:
+If the admin set up `TRICON_DE_ADAPTIVE_DEMO_WH` (see `admin/03_optional.sql`, block 3c), the facilitator can show the conversion live:
 
 ```sql
 SHOW WAREHOUSES LIKE 'TRICON_DE_ADAPTIVE_DEMO_WH';
