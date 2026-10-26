@@ -39,7 +39,7 @@ with st.container(border=True):
     st.markdown("""
 Every Part 2 workflow **proposes**; a person **approves**. The agents draft fixes, policies, findings, and SQL — they never revoke access, apply masking to shared data, resize production warehouses, or push to `main` on their own. This lab builds that boundary in three layers:
 
-1. **Least-privilege roles** — the lab role can only write to your own dbt schema.
+1. **Least-privilege roles** — the lab role can only create objects inside the `TRICON_DE` lab database, and `AGENTS.md` keeps CoCo in your own schema.
 2. **A PreToolUse hook** — blocks `dbt ... --target prod` before CoCo can run it.
 3. **Approval steps in every skill and subagent** — outputs are written as proposals for review.
 """)
@@ -50,10 +50,11 @@ st.markdown("#### Prerequisites")
 with st.container(border=True):
     st.markdown("""
 - Familiarity with dbt (models, sources, tests), Snowflake, and Git
-- **CoCo Desktop**, **Git**, and **dbt Core with dbt-snowflake** installed (see **Getting Started**)
-- The `TRICON_DE_ROLE` role and `TRICON_DE_WH` warehouse, both pre-provisioned by your admin
+- **Getting Started** finished before lab day: CoCo Desktop, Git, and dbt installed, your dbt profile created, and the 6-row self-check passing
+- Your row from the admin's lab user list, typed into the **sidebar** (initials, sign-in type, username, account)
 - Optional for modules A3 and A6: the `TRICON_DE_REVIEWER` role (read-only account metadata)
-- Your initials entered in the sidebar
+
+Stuck at any point? **Help & Troubleshooting** in the menu lists every known symptom and its fix.
 """)
 
 st.space("medium")

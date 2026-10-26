@@ -4,6 +4,7 @@
 **Time:** about 15 minutes, at least 3 business days before the lab
 **Lab guide (send to attendees):** https://coco-hol-tricon-de-gejm3sg47ufychnq9jpkqg.streamlit.app/
 **Scripts:** the `admin/` folder of https://github.com/sfc-gh-cwalker/coco-hol-tricon-de
+**Full checklist (account, laptops, dry run):** [`LAB_READINESS_GUIDE.md`](LAB_READINESS_GUIDE.md)
 
 The lab follows Snowflake's [Data Engineering with CoCo](https://www.snowflake.com/en/developers/guides/data-engineering-with-coco/) guide, adapted so a whole team can run it at once. **Each attendee gets their own personal schema**, so nobody overwrites anyone else.
 
@@ -36,6 +37,12 @@ The lab follows Snowflake's [Data Engineering with CoCo](https://www.snowflake.c
 
 ---
 
+## Step 0: Readiness check (read-only, 2 minutes)
+
+Paste `admin/00_readiness_check.sql` into a worksheet, pick any warehouse, and click **Run All**. It changes nothing and returns one PASS/WARN/FAIL row per account setting the lab depends on: cross-region inference, the CoCo Desktop credit limit, model allowlist, browser sign-in (Local OAuth), network and authentication policies, and name conflicts. Fix every **FAIL** before Step 1. Each row's `what_to_do` column explains it, and `LAB_READINESS_GUIDE.md` Part A has the detail.
+
+---
+
 ## Step 1: Fill in the attendee list
 
 Open `admin/tricon_de_lab_setup.sql` and edit **section 0 only**. Add one line per person, including yourself so you can test. You can mix the three login types below in one list:
@@ -61,7 +68,7 @@ Every option gives each person **their own schema**. They differ only in which S
 
 | Option | Write in `user` | Who it's for | Login experience | Recommendation |
 |---|---|---|---|---|
-| **A) Existing user** | Their user NAME | Anyone with a Snowflake login today | Exactly as today (e.g. Tricon SSO). dbt uses `authenticator: externalbrowser` | **Use this whenever possible** |
+| **A) Existing user** | Their user NAME | Anyone with a Snowflake login today | Exactly as today (e.g. Tricon SSO). CoCo Desktop and dbt sign in through the browser (Local OAuth) | **Use this whenever possible** |
 | **B) Temporary lab login** | `"NEW"` | People with no Snowflake user (contractors, new joiners, India team members not yet provisioned) | Script creates `TRICON_DE_<INITIALS>` with the **shared starting password**. Snowflake **forces each person to replace it with their own** and enroll in MFA at first sign-in. **Auto-expires after 30 days** | Good fallback |
 | **C) Shared login** | The same user for several people (e.g. `"NEW"` with initials `LAB`, then `"TRICON_DE_LAB"` for the others) | Last resort when individual logins aren't possible | Everyone signs in as one user; each still uses their own initials and schema | **Not recommended** (see below) |
 
@@ -146,9 +153,9 @@ The last result of the script is the **lab user list**, with one row per person;
 | `lab_guide` | The lab guide app link |
 | `initials` | What they type in the lab app's sidebar |
 
-Ask everyone to complete **Getting Started** in the lab guide before lab day: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, which usually need IT approval.
+Ask everyone to complete **Getting Started** in the lab guide before lab day, and to send you the PASS table from its last step. It covers installing CoCo Desktop, Git, and dbt (via `uv`), which usually need IT approval: see `LAB_READINESS_GUIDE.md` Part B for the IT checklist.
 - **Option A** attendees sign in with their normal Tricon login (e.g. SSO). Nothing is stored and no token is created.
-- **Option B/C** attendees open the `login_url` and sign in with their `username` and the starting password. Snowflake makes them choose their own password and set up MFA. Then they use that login in CoCo Desktop. The Getting Started page has the dbt profile for password logins.
+- **Option B/C** attendees open the `login_url` and sign in with their `username` and the starting password. Snowflake makes them choose their own password and set up MFA. Then they use that login in CoCo Desktop and dbt.
 
 **Adding people later:** add them to section 0 and click Run All again. Existing attendees aren't affected.
 

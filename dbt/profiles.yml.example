@@ -1,5 +1,11 @@
-# Copy the tricon_de block into ~/.dbt/profiles.yml and replace the placeholders.
-# Uses your normal Tricon SSO login (browser pop-up) - no password or PAT stored.
+# The lab app's Getting Started page (Step 5) writes a personalized copy of this file
+# to the PROJECT ROOT as profiles.yml (git-ignored). dbt reads it from there, so your
+# ~/.dbt/profiles.yml is never touched.
+#
+# authenticator options (no password or token is ever stored in this file):
+#   oauth_authorization_code   browser sign-in through Snowflake (recommended; works for SSO and password+MFA users)
+#   externalbrowser            Tricon SSO in a browser pop-up (fallback for SSO users)
+#   username_password_mfa      temporary lab logins, with password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
 tricon_de:
   target: dev
   outputs:
@@ -7,10 +13,9 @@ tricon_de:
       type: snowflake
       account: "<TRICON_ACCOUNT_IDENTIFIER>"
       user: "<YOUR_SNOWFLAKE_USERNAME>"
-      authenticator: externalbrowser
+      authenticator: oauth_authorization_code
       role: TRICON_DE_ROLE
       database: TRICON_DE
       warehouse: TRICON_DE_WH
       schema: DBT_<INITIALS>
       threads: 4
-      client_session_keep_alive: false

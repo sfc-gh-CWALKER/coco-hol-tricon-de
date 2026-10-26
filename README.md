@@ -14,18 +14,22 @@ Every Part 2 automation **proposes**; a person **approves**.
 ├── dbt/                   # Starter dbt project over SNOWFLAKE_SAMPLE_DATA.TPCH_SF1
 │   ├── models/            # customers.sql, orders_summary.sql (with a planted convention violation), _sources.yml
 │   ├── seeds/             # resident_contacts.csv - SYNTHETIC PII for the classification workflow
-│   └── profiles.yml.example   # SSO (externalbrowser) profile, per-attendee schema
+│   └── profiles.yml.example   # Browser sign-in (Local OAuth) profile, per-attendee schema
 ├── solutions/tricon-de-plugin/   # Reference skills, subagents, hook, and manifest
 └── admin/                 # ADMIN_GUIDE.md + numbered setup, verify and teardown scripts
 ```
 
 ## For attendees
 
-Open the lab guide app and follow **Getting Started**. In short: install CoCo Desktop, Git, and `dbt-core` + `dbt-snowflake`, clone this repo, open it in CoCo Desktop, configure `~/.dbt/profiles.yml`, and enter your initials in the app sidebar.
+Open the lab guide app and follow **Getting Started**. In short: install CoCo Desktop, Git, and dbt (via `uv`), clone this repo, open it in CoCo Desktop, fill in the app sidebar, and paste the generated command that writes `profiles.yml` into the project folder.
+
+## For Tricon's admin and for dry-run testers
+
+Start with [`admin/LAB_READINESS_GUIDE.md`](admin/LAB_READINESS_GUIDE.md): the complete checklist for Tricon's account, attendee laptops, and an end-to-end dry run.
 
 ## For the admin
 
-Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (one script: `tricon_de_lab_setup.sql`, then `05_verify.sql`; teardown `99_teardown.sql`). It creates:
+Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (read-only `00_readiness_check.sql`, then one script: `tricon_de_lab_setup.sql`, then `05_verify.sql`; teardown `99_teardown.sql`). It creates:
 
 | Object | Purpose |
 |--------|---------|
@@ -38,7 +42,7 @@ Follow [`admin/ADMIN_GUIDE.md`](admin/ADMIN_GUIDE.md) (one script: `tricon_de_la
 
 ### Differences from the original guide
 
-- **Authentication:** dbt uses `authenticator: externalbrowser` (SSO). The guide's PAT + `MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT` bypass is **not** used on the customer account. CI/CD needs a Tricon-approved service user and network policy.
+- **Authentication:** dbt and CoCo Desktop sign in through the browser (`authenticator: oauth_authorization_code`, with SSO and password+MFA fallbacks); nothing secret is stored. The guide's PAT + `MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT` bypass is **not** used on the customer account. CI/CD needs a Tricon-approved service user and network policy.
 - **Isolation:** each attendee builds into `TRICON_DE.DBT_<INITIALS>` rather than a shared `DEMO_DB.TPCH_TRANSFORMED`, and the setup avoids granting ownership of shared objects.
 - **Safety rules** are added to `AGENTS.md`, and every automation writes to `proposals/` for approval.
 

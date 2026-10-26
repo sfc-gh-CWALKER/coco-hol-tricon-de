@@ -2,7 +2,15 @@ from pathlib import Path
 
 import streamlit as st
 
-from components import attendee_schema, is_session_complete
+from components import (
+    LOGIN_TEMP,
+    LOGIN_USUAL,
+    PERSISTED_KEYS,
+    attendee_schema,
+    attendee_user,
+    is_session_complete,
+    setup_complete,
+)
 
 _DIR = Path(__file__).parent
 
@@ -10,6 +18,21 @@ _DIR = Path(__file__).parent
 def _title(key: str, label: str) -> str:
     check = " :green[:material/check_circle:]" if is_session_complete(key) else ""
     return f"{key}. {label}{check}"
+
+
+def _sync_to_url():
+    for k in PERSISTED_KEYS:
+        v = st.session_state.get(k)
+        if v:
+            st.query_params[k] = v
+        elif k in st.query_params:
+            del st.query_params[k]
+
+
+# Restore sidebar values after a browser refresh (they're kept in the URL, never anything secret).
+for _k in PERSISTED_KEYS:
+    if _k not in st.session_state and _k in st.query_params:
+        st.session_state[_k] = st.query_params[_k]
 
 
 st.set_page_config(
@@ -24,14 +47,40 @@ st.logo(
 )
 
 with st.sidebar:
+    st.markdown("**Your lab details** · from the row your admin sent you")
     st.text_input(
         "Your initials",
         key="initials",
         max_chars=4,
         placeholder="e.g. CW",
-        help="Personalizes every prompt with your own dbt schema. Press Enter to apply.",
+        help="Use the initials in your admin's list. They name your personal schema. Press Enter to apply.",
+        on_change=_sync_to_url,
     )
-    st.caption(f"Your dbt schema: `TRICON_DE.{attendee_schema()}`")
+    st.radio(
+        "How do you sign in to Snowflake?",
+        [LOGIN_USUAL, LOGIN_TEMP],
+        key="login_type",
+        on_change=_sync_to_url,
+        help="Your admin's list shows your login_type: A = your usual login, B or C = a temporary lab login.",
+    )
+    st.text_input(
+        "Snowflake username",
+        key="sf_user",
+        placeholder="TRICON_DE_<initials>" if st.session_state.get("login_type") == LOGIN_TEMP else "e.g. JSMITH",
+        help="The 'username' column in your admin's list. Temporary lab logins can leave this blank.",
+        on_change=_sync_to_url,
+    )
+    st.text_input(
+        "Account identifier",
+        key="sf_account",
+        placeholder="e.g. tricon-prod",
+        help="The 'account_identifier' column in your admin's list (orgname-accountname).",
+        on_change=_sync_to_url,
+    )
+    if setup_complete():
+        st.success(f"Every command and prompt now uses **{attendee_user()}** and **`TRICON_DE.{attendee_schema()}`**.", icon=":material/check_circle:")
+    else:
+        st.warning("Fill in all four so every command on these pages is ready to copy as-is.", icon=":material/edit:")
 
 page = st.navigation(
     {
@@ -39,6 +88,7 @@ page = st.navigation(
             st.Page("app_pages/home.py", title="Home", icon=":material/home:"),
             st.Page("app_pages/getting_started.py", title="Getting Started", icon=":material/rocket_launch:"),
             st.Page("app_pages/agenda.py", title="Agenda", icon=":material/calendar_today:"),
+            st.Page("app_pages/help.py", title="Help & Troubleshooting", icon=":material/support:"),
             st.Page("app_pages/guide_mapping.py", title="Guide Mapping", icon=":material/compare_arrows:"),
         ],
         "Part 1: Engineering Standards (from the guide)": [

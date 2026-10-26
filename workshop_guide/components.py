@@ -15,10 +15,62 @@ SESSION_PROMPTS = {
 }
 
 INITIALS_PLACEHOLDER = "<INITIALS>"
+ACCOUNT_PLACEHOLDER = "<TRICON_ACCOUNT_IDENTIFIER>"
+USER_PLACEHOLDER = "<YOUR_SNOWFLAKE_USERNAME>"
+LOGIN_USUAL = "My usual Tricon Snowflake login"
+LOGIN_TEMP = "A temporary lab login (TRICON_DE_...)"
+
+# Sidebar values that are mirrored into the URL so a browser refresh keeps them.
+PERSISTED_KEYS = ("initials", "login_type", "sf_user", "sf_account")
 
 
 def attendee_initials() -> str:
     return "".join(c for c in st.session_state.get("initials", "") if c.isalnum()).upper()
+
+
+def attendee_account() -> str:
+    return st.session_state.get("sf_account", "").strip() or ACCOUNT_PLACEHOLDER
+
+
+def uses_temp_login() -> bool:
+    return st.session_state.get("login_type") == LOGIN_TEMP
+
+
+def attendee_user() -> str:
+    """Snowflake login name: typed by the attendee, or TRICON_DE_<INITIALS> for temporary lab logins."""
+    typed = st.session_state.get("sf_user", "").strip().upper()
+    if typed:
+        return typed
+    if uses_temp_login():
+        return f"TRICON_DE_{attendee_initials() or INITIALS_PLACEHOLDER}"
+    return USER_PLACEHOLDER
+
+
+def setup_complete() -> bool:
+    return bool(attendee_initials()) and attendee_account() != ACCOUNT_PLACEHOLDER and attendee_user() != USER_PLACEHOLDER
+
+
+def profiles_yml(authenticator: str = "oauth_authorization_code") -> str:
+    """Personalized dbt profile. Lives at the project root, so ~/.dbt/profiles.yml is never touched."""
+    auth_lines = {
+        "oauth_authorization_code": "      authenticator: oauth_authorization_code   # browser sign-in; nothing stored",
+        "externalbrowser": "      authenticator: externalbrowser            # Tricon SSO in a browser pop-up",
+        "username_password_mfa": "      authenticator: username_password_mfa\n      password: \"{{ env_var('SNOWFLAKE_PASSWORD') }}\"   # read from your terminal, never saved",
+    }[authenticator]
+    return f"""tricon_de:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{attendee_account()}"
+      user: "{attendee_user()}"
+{auth_lines}
+      role: TRICON_DE_ROLE
+      database: TRICON_DE
+      warehouse: TRICON_DE_WH
+      schema: {attendee_schema()}
+      threads: 4
+"""
 
 
 def attendee_schema() -> str:
@@ -28,7 +80,13 @@ def attendee_schema() -> str:
 
 def personalize(text: str) -> str:
     initials = attendee_initials()
-    return text.replace(INITIALS_PLACEHOLDER, initials) if initials else text
+    if initials:
+        text = text.replace(INITIALS_PLACEHOLDER, initials)
+    if attendee_account() != ACCOUNT_PLACEHOLDER:
+        text = text.replace(ACCOUNT_PLACEHOLDER, attendee_account())
+    if attendee_user() != USER_PLACEHOLDER:
+        text = text.replace(USER_PLACEHOLDER, attendee_user())
+    return text
 
 
 def _done_store() -> dict:
@@ -98,6 +156,26 @@ def render_technologies_used(technologies: list[dict]):
 
 def render_code(code: str, language: str = "bash"):
     st.code(personalize(code), language=language, wrap_lines=True)
+
+
+def render_expected(text: str):
+    """What a correct result looks like, so attendees can self-check every step."""
+    st.success(personalize(f":material/check_circle: **You should see:** {text}"))
+
+
+def render_troubleshoot(rows: list[tuple[str, str]], title: str = "Something different? Fixes"):
+    """Symptom -> fix table in a collapsed expander."""
+    with st.expander(f":material/build: {title}"):
+        table = "| If you see | Do this |\n|---|---|\n" + "\n".join(
+            f"| {symptom} | {fix} |" for symptom, fix in rows)
+        st.markdown(personalize(table))
+
+
+def render_before_you_start(items: list[str]):
+    with st.container(border=True):
+        st.markdown("##### :material/checklist: Before you start this module")
+        for item in items:
+            st.markdown(f"- {personalize(item)}")
 
 
 def render_guide_change(original: str, tricon: str, why: str):

@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code, render_guide_change, render_new_for_tricon
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code, render_guide_change, render_new_for_tricon, render_expected, render_troubleshoot, render_before_you_start
 
 render_session_header("Module 2", "Tests & a Custom Skill", "20 min", "Schema tests, a new-dbt-model skill, and a supplier_performance model built with it")
 
@@ -7,6 +7,12 @@ render_technologies_used([
     {"name": "Agent Skills", "description": "A folder with a SKILL.md file: YAML frontmatter (name, description) plus Markdown instructions for a repeatable workflow.", "icon": "auto_fix_high"},
     {"name": "Project skills", "description": "CoCo auto-discovers skills in .snowflake/cortex/skills/ inside the open workspace, with no install step.", "icon": "folder_special"},
     {"name": "dbt schema tests", "description": "not_null, unique, accepted_values, and other checks that run on every dbt build.", "icon": "fact_check"},
+])
+
+render_before_you_start([
+    "Module 1 is done: `AGENTS.md` exists at the project root and `dbt build` passed.",
+    "You're on the `feature/add-tricon-de-plugin` branch (bottom-left of CoCo Desktop shows the branch name).",
+    "Start a **new chat** for this module.",
 ])
 
 st.markdown("#### Step 1: CoCo without a skill")
@@ -25,6 +31,13 @@ render_guide_change(
     "Saves a step; the result is the same.")
 
 render_prompt("Prompt 2.1", "Add Schema Tests (No Skill)", PROMPT_2_1)
+render_expected("A new `dbt/models/_schema.yml`, then `dbt build` with **every test PASS** (around 8–15 tests, depending on what CoCo adds), `ERROR=0`.")
+render_troubleshoot([
+    ("`accepted_values` on `order_status` FAILS", "TPC-H has three statuses: **F, O and P**. Ask CoCo: *Check the distinct order_status values in the data and fix the test.* (Module A1 plants this failure on purpose later.)"),
+    ("`unique` fails on a column other than the primary key", "Expected: only `customer_key` and `order_key` are unique. Ask CoCo to keep `unique` on primary keys only."),
+    ("`dbt_project.yml ... arguments` or *unexpected key* errors", "Your dbt is older than 1.10. Upgrade: `uv tool install --force --python 3.12 dbt-core --with dbt-snowflake`."),
+    ("CoCo named the file `schema.yml`", "Ask it to rename the file to `_schema.yml`."),
+])
 
 render_explanation("What this demonstrates", """
 CoCo finds the primary keys (`customer_key`, `order_key`), writes `_schema.yml`, and picks sensible column tests on its own.
@@ -37,6 +50,7 @@ We still had to name the file `_schema.yml`; otherwise CoCo defaults to `schema.
 st.markdown("#### Step 2: Write a custom skill")
 st.markdown("Rule of thumb: if you find yourself starting a prompt with *\"remember, we always...\"*, that's a skill waiting to be written. Create the folder first:")
 render_code("mkdir -p .snowflake/cortex/skills/new-dbt-model")
+st.caption("Run it in the CoCo Desktop terminal, which opens in the project folder. Windows PowerShell: `mkdir .snowflake/cortex/skills/new-dbt-model`.")
 
 PROMPT_2_2 = """Create a custom skill at .snowflake/cortex/skills/new-dbt-model/SKILL.md for creating
 new dbt models in this project.
@@ -61,6 +75,7 @@ handling instructions. The model is smart enough to infer the details."""
 st.caption(":green-badge[Same as original guide] Prompts 2.2 and 2.3 are word-for-word from the guide.")
 
 render_prompt("Prompt 2.2", "Create the new-dbt-model Skill", PROMPT_2_2)
+render_expected("A new `.snowflake/cortex/skills/new-dbt-model/SKILL.md` with `name:` and `description:` frontmatter, a **Conventions** list (3 items) and a **Workflow** list (4 items).")
 
 render_explanation("What a good SKILL.md looks like", """
 ```markdown
@@ -93,6 +108,16 @@ It should summarize performance metrics per supplier from the supplier and linei
 Include total orders, total revenue, and average discount."""
 
 render_prompt("Prompt 2.3", "Build a Model with the Skill", PROMPT_2_3)
+render_expected("CoCo says it's using the **new-dbt-model** skill, writes `dbt/models/supplier_performance.sql` and its `_schema.yml` entry, and `dbt build --select supplier_performance` passes (10,000 suppliers, `not_null` + `unique` on `supplier_key` PASS).")
+render_troubleshoot([
+    ("CoCo doesn't mention the skill", "Check the file is at exactly `.snowflake/cortex/skills/new-dbt-model/SKILL.md`, then start a new chat and retry. You can also type `/new-dbt-model` in the chat."),
+    ("CoCo asks which source tables to use", "That's step 1 of your skill working. Answer: *supplier and lineitem.*"),
+    ("The model references `SNOWFLAKE_SAMPLE_DATA...` directly", "Ask: *Follow the skill's conventions.* It should switch to `source()`."),
+])
+
+st.markdown("#### Checkpoint: save your work")
+render_code("""git add -A
+git commit -m "Module 2: tests, new-dbt-model skill, supplier_performance\"""")
 
 render_explanation("What to watch for", """
 CoCo matches your prompt to the skill's description, then follows the workflow in order:

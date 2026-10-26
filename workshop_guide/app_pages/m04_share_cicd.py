@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_guide_change, render_new_for_tricon
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_guide_change, render_new_for_tricon, render_expected, render_troubleshoot
 
 render_session_header("Module 4", "Share & CI/CD", "15 min · optional", "Plugin published to the Plugins Catalog, and dbt-review running on every pull request")
 
@@ -13,6 +13,12 @@ render_guide_change(
     "Uses the `DEMO_PAT` Personal Access Token and `MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT = 60` so GitHub runners can connect.",
     "Same steps and an identical Prompt 4.1, but authentication must use a **Tricon-approved service user and network policy**, or run Option B in a trial account.",
     "A network-policy bypass on a customer production account isn't acceptable.")
+
+st.info("""
+:material/info: **This module is optional.** Modules 1–3 are the complete core lab. Do Module 4 only if the facilitator says so:
+- **Option A (Plugins Catalog)** works on Tricon's account with no extra setup. It takes about 5 minutes.
+- **Option B (GitHub Actions)** needs a GitHub fork **and** a CI service user approved by Tricon's admin. Without both, the facilitator demos it instead.
+""")
 
 st.markdown("#### Option A: Publish to the Plugins Catalog")
 with st.container(border=True):
@@ -29,8 +35,14 @@ snow://skill_catalog/USER$<YOUR_USERNAME>.SKILL_SHARING.TRICON_DE/versions/versi
 
 A teammate installs it with **Plugins → + → Add from Plugins Catalog** and pastes the URI. This is how Tricon's dbt standards reach the India team without a repo copy.
 
-:material/info: Publishing requires the `CREATE CORTEX EXTENSION` privilege in your account. Check with your admin if the button fails.
+:material/info: Any user can share plugins they own; the extension is created in your personal database. If the button fails, send the error to the facilitator.
 """)
+render_expected("A `snow://skill_catalog/...TRICON_DE...` link. A neighbour pastes it into their CoCo Desktop chat and gets `tricon-de` under Settings → Plugins.")
+render_troubleshoot([
+    ("*Insufficient privileges* / *personal database not enabled*", "Personal databases may be switched off in Tricon's account. The facilitator demos this step instead."),
+    ("Neighbour sees *not available*", "The security scan is still running (usually under a minute). Try again shortly."),
+    ("Neighbour already has `tricon-de` installed", "Expected: everyone built one. Install into a fresh folder, or skip."),
+])
 
 st.space("small")
 st.markdown("#### Option B: Run dbt-review in GitHub Actions")
