@@ -55,6 +55,7 @@ st.logo(
 
 with st.sidebar:
     st.markdown("**Your lab details** · from the row your admin sent you")
+    st.caption("Only used to fill in the commands and prompts on these pages, so you can copy them as-is. Nothing is sent or saved: this app isn't connected to Snowflake. Never type a password here.")
     st.text_input(
         "Your initials",
         key="initials",
