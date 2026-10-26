@@ -315,3 +315,53 @@ ORDER BY IFF(r.temp_password IS NOT NULL, 0, 1), r.initials;
 
 -- EXPECT every row READY. Next: admin/05_verify.sql (2 minutes), then send attendees their rows.
 -- Optional extras (reviewer role, email, Adaptive demo): admin/03_optional.sql
+
+-- =====================================================================================
+-- 6. CLEAN UP AFTER THE LAB - REMOVE EVERYTHING THIS SCRIPT CREATED  (switched OFF)
+--
+--    It is inside a comment so "Run All" can never delete the lab by accident.
+--    When the lab is over:
+--      1. Delete the TWO lines below that say "REMOVE THIS LINE TO ENABLE CLEANUP"
+--         (one just under this box, one at the very end of the file)
+--      2. Highlight everything from "USE ROLE ACCOUNTADMIN;" below to the end of the file
+--      3. Press Cmd/Ctrl + Enter to run ONLY the highlighted part
+--
+--    Removes: every temporary lab login (TRICON_DE_<INITIALS>), the TRICON_DE database
+--    (all personal schemas and everything attendees built), TRICON_DE_WH, TRICON_DE_ADAPTIVE_DEMO_WH,
+--    TRICON_DE_MONITOR, TRICON_DE_EMAIL_INT, TRICON_DE_REVIEWER and TRICON_DE_ROLE.
+--    Never removes: real (existing) users - they simply lose the lab role; any object without
+--    the exact lab names or the "TEMPORARY - Tricon CoCo DE lab" label; SNOWFLAKE_SAMPLE_DATA.
+--    (Same as admin/99_teardown.sql.)
+-- =====================================================================================
+/*  REMOVE THIS LINE TO ENABLE CLEANUP
+
+USE ROLE ACCOUNTADMIN;
+
+-- 6a. Temporary lab logins created with "NEW" - only users labelled by this lab
+DECLARE
+  rs RESULTSET;
+  dropped STRING DEFAULT '';
+BEGIN
+  rs := (SHOW USERS LIKE 'TRICON\\_DE\\_%');
+  FOR u IN rs DO
+    IF (COALESCE(u."comment", '') ILIKE 'TEMPORARY - Tricon CoCo DE lab%') THEN
+      EXECUTE IMMEDIATE 'DROP USER IF EXISTS "' || REPLACE(u."name", '"', '""') || '"';
+      dropped := dropped || u."name" || ' ';
+    END IF;
+  END FOR;
+  RETURN 'Temporary lab users dropped: ' || IFF(dropped = '', '(none)', dropped);
+END;
+
+-- 6b. Lab objects (exact names only)
+DROP DATABASE         IF EXISTS TRICON_DE;
+DROP WAREHOUSE        IF EXISTS TRICON_DE_WH;
+DROP WAREHOUSE        IF EXISTS TRICON_DE_ADAPTIVE_DEMO_WH;
+DROP RESOURCE MONITOR IF EXISTS TRICON_DE_MONITOR;
+DROP INTEGRATION      IF EXISTS TRICON_DE_EMAIL_INT;
+DROP ROLE             IF EXISTS TRICON_DE_REVIEWER;
+DROP ROLE             IF EXISTS TRICON_DE_ROLE;
+
+-- 6c. Confirm - should return 0 rows (nothing named TRICON_DE_* left)
+SHOW USERS LIKE 'TRICON\\_DE\\_%';
+
+REMOVE THIS LINE TO ENABLE CLEANUP  */

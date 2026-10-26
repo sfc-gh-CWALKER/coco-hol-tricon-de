@@ -187,6 +187,10 @@ The core lab doesn't need any of these.
 
 ## After the lab: `99_teardown.sql`
 
+Two equivalent ways to remove everything:
+- **Section 6 at the end of `tricon_de_lab_setup.sql`.** It's switched off inside a comment so Run All can never delete anything by accident. Delete the two lines that say `REMOVE THIS LINE TO ENABLE CLEANUP`, highlight from `USE ROLE ACCOUNTADMIN;` to the end, and press Cmd/Ctrl + Enter.
+- **`99_teardown.sql`.** Paste it into a worksheet and click Run All.
+
 Run it in a worksheet after hackathon week. It lists what it will remove, then drops **only** these exact names:
 - `TRICON_DE`, including every personal schema
 - `TRICON_DE_WH` and `TRICON_DE_ADAPTIVE_DEMO_WH`
