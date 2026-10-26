@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code, render_guide_change, render_new_for_tricon
 
 render_session_header("Module 1", "AGENTS.md", "15 min", "Project context CoCo reads every session, plus a conventions audit")
 
@@ -28,6 +28,11 @@ PROMPT_1_1 = """Create an AGENTS.md file at the root of this project. Include:
 - Never run dbt against --target prod, and never change grants, masking policies, or warehouse settings without my explicit approval — write proposals to the proposals/ folder instead
 - Ignore the workshop_guide/ and solutions/ folders; they are lab materials, not project code
 - This project uses CoCo Desktop — do not use the `cortex` CLI command"""
+
+render_guide_change(
+    "`DEMO_DB`, `TPCH_TRANSFORMED`, `DEMO_WH` (no role line, no safety line).",
+    "`TRICON_DE`, `DBT_<INITIALS>`, `TRICON_DE_WH`, `TRICON_DE_ROLE`, plus two added lines: a **safety rule** (no `--target prod`; grants, masking, and warehouse changes go to `proposals/`) and **ignore `workshop_guide/` and `solutions/`**.",
+    "Per-attendee schemas on a shared customer account, and Part 2 relies on the safety rule.")
 
 render_prompt("Prompt 1.1", "Create AGENTS.md", PROMPT_1_1)
 

@@ -39,14 +39,15 @@ page = st.navigation(
             st.Page("app_pages/home.py", title="Home", icon=":material/home:"),
             st.Page("app_pages/getting_started.py", title="Getting Started", icon=":material/rocket_launch:"),
             st.Page("app_pages/agenda.py", title="Agenda", icon=":material/calendar_today:"),
+            st.Page("app_pages/guide_mapping.py", title="Guide Mapping", icon=":material/compare_arrows:"),
         ],
-        "Part 1: Engineering Standards": [
+        "Part 1: Engineering Standards (from the guide)": [
             st.Page("app_pages/m01_agents_md.py", title=_title("1", "AGENTS.md"), icon=":material/description:"),
             st.Page("app_pages/m02_skill.py", title=_title("2", "Tests & Custom Skill"), icon=":material/auto_fix_high:"),
             st.Page("app_pages/m03_plugin.py", title=_title("3", "Plugin, Hook & Subagent"), icon=":material/extension:"),
             st.Page("app_pages/m04_share_cicd.py", title=_title("4", "Share & CI/CD"), icon=":material/sync_alt:"),
         ],
-        "Part 2: Automation Workflows": [
+        "Part 2: Automation Workflows (new for Tricon)": [
             st.Page("app_pages/a1_dbt_upkeep.py", title=_title("A1", "dbt Upkeep"), icon=":material/build_circle:"),
             st.Page("app_pages/a2_classification.py", title=_title("A2", "Classification Sweep"), icon=":material/policy:"),
             st.Page("app_pages/a3_access_review.py", title=_title("A3", "Access Review"), icon=":material/admin_panel_settings:"),

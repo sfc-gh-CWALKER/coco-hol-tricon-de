@@ -1,11 +1,16 @@
 import streamlit as st
 
-from components import attendee_schema, render_code
+from components import attendee_schema, render_code, render_guide_change, render_guide_change, render_new_for_tricon
 
 st.title("Getting Started")
 st.markdown("Install the tools, clone the starter project, and connect dbt and CoCo Desktop to Tricon's Snowflake account. **Do this before the lab** — installs often need IT approval.")
 
 st.space("small")
+
+render_guide_change(
+    "Fork `Snowflake-Labs/sfguide-data-engineering-with-coco`, run `scripts/setup.sql` yourself (creates `DEMO_ROLE`/`DEMO_WH`/`DEMO_DB`), create a PAT, and bypass the network policy.",
+    "Clone `coco-hol-tricon-de` (same `dbt/` starter). Tricon's admin pre-provisions `TRICON_DE_*` via `admin/setup.sql`. dbt signs in with **SSO**, and each attendee gets their own `DBT_<INITIALS>` schema.",
+    "Customer account: least privilege, no stored secrets, no network-policy changes, and no collisions between attendees.")
 
 st.markdown("#### Step 1: Install the tools")
 with st.container(border=True):

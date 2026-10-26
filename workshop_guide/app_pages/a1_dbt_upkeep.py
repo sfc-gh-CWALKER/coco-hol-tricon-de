@@ -3,6 +3,8 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A1", "dbt Project Upkeep", "15 min", "dbt-test-triage skill: run the build, triage failing tests, draft simple fixes for review")
 
+st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+
 render_technologies_used([
     {"name": "dbt build results", "description": "dbt writes run results to target/run_results.json, so the agent can tell which tests failed and why.", "icon": "fact_check"},
     {"name": "Custom skill", "description": "Encodes Tricon's triage rules: which failures are safe to auto-draft and which always go to a person.", "icon": "auto_fix_high"},

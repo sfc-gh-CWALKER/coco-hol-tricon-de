@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code, render_guide_change, render_new_for_tricon
 
 render_session_header("Module 2", "Tests & a Custom Skill", "20 min", "Schema tests, a new-dbt-model skill, and a supplier_performance model built with it")
 
@@ -18,6 +18,11 @@ At a minimum, each model's primary key should have not_null and unique tests.
 Add any other tests that make sense given the columns in each model.
 For parameterized tests like accepted_values, nest all test parameters under an arguments: key.
 Then run dbt build --project-dir dbt/."""
+
+render_guide_change(
+    "Same prompt, and you run `dbt build` yourself afterwards.",
+    "The final line \"Then run dbt build --project-dir dbt/.\" is appended.",
+    "Saves a step; the result is the same.")
 
 render_prompt("Prompt 2.1", "Add Schema Tests (No Skill)", PROMPT_2_1)
 
@@ -52,6 +57,8 @@ The skill should have exactly two sections:
 Use the name new-dbt-model. Write a one-sentence description that tells CoCo when
 to invoke this skill. Keep the skill concise — no sub-steps, no examples, no error
 handling instructions. The model is smart enough to infer the details."""
+
+st.caption(":green-badge[Same as original guide] Prompts 2.2 and 2.3 are word-for-word from the guide.")
 
 render_prompt("Prompt 2.2", "Create the new-dbt-model Skill", PROMPT_2_2)
 

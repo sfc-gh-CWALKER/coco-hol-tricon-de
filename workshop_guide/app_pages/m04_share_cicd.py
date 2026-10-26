@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_guide_change, render_new_for_tricon
 
 render_session_header("Module 4", "Share & CI/CD", "15 min · optional", "Plugin published to the Plugins Catalog, and dbt-review running on every pull request")
 
@@ -8,6 +8,11 @@ render_technologies_used([
     {"name": "CoCo CLI in CI", "description": "The terminal form of CoCo runs headlessly in GitHub Actions and auto-discovers the same .cortex/plugins/ folder.", "icon": "terminal"},
     {"name": "GitHub Actions", "description": "Runs the dbt-review subagent on every PR that touches dbt/models/** and posts the report as a comment.", "icon": "sync_alt"},
 ])
+
+render_guide_change(
+    "Uses the `DEMO_PAT` Personal Access Token and `MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT = 60` so GitHub runners can connect.",
+    "Same steps and an identical Prompt 4.1, but authentication must use a **Tricon-approved service user and network policy**, or run Option B in a trial account.",
+    "A network-policy bypass on a customer production account isn't acceptable.")
 
 st.markdown("#### Option A: Publish to the Plugins Catalog")
 with st.container(border=True):

@@ -100,6 +100,17 @@ def render_code(code: str, language: str = "bash"):
     st.code(personalize(code), language=language, wrap_lines=True)
 
 
+def render_guide_change(original: str, tricon: str, why: str):
+    """Callout marking a deliberate difference from Jeremiah Hansen's original guide."""
+    with st.container(border=True):
+        st.markdown(":orange-badge[:material/edit_note: Adjusted for Tricon]")
+        st.markdown(personalize(f"**Original guide:** {original}  \n**This lab:** {tricon}  \n**Why:** {why}"))
+
+
+def render_new_for_tricon(text: str):
+    st.markdown(f":blue-badge[:material/add_circle: New for Tricon] {text}")
+
+
 def render_guardrail(text: str):
     st.warning(f":material/verified_user: **Human approval required.** {text}")
 

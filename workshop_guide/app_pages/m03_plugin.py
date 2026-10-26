@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_code, render_guide_change, render_new_for_tricon
 
 render_session_header("Module 3", "Plugin, Hook & Subagent", "25 min", "The tricon-de plugin: skill + prod-safety hook + dbt-review subagent")
 
@@ -26,6 +26,11 @@ A skill alone only lives in one workspace, and it isn't versioned or installable
 
 Part 2 adds more skills and subagents to this same plugin.
 """)
+
+render_guide_change(
+    "Plugin `coco-de-guide` in `.cortex/plugins/coco-de-guide/`.",
+    "Plugin `tricon-de` in `.cortex/plugins/tricon-de/`; the manifest also has a `description`. Prompts 3.2–3.5 are otherwise word-for-word.",
+    "Tricon-branded, and it becomes the home for the Part 2 skills and subagents.")
 
 st.markdown("#### Step 1: Move the skill into the plugin")
 st.markdown("CoCo auto-discovers project plugins in `.cortex/plugins/`. Run these in the terminal:")

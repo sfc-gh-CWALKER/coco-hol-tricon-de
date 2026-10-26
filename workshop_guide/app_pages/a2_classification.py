@@ -3,6 +3,8 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A2", "Sensitive Data Classification Sweep", "15 min", "classification-sweep subagent: classify new tables, propose tags and masking, route for approval")
 
+st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+
 render_technologies_used([
     {"name": "SYSTEM$CLASSIFY", "description": "Samples a table's columns and recommends semantic categories (EMAIL, PHONE_NUMBER, DATE_OF_BIRTH...) and privacy categories (IDENTIFIER, QUASI_IDENTIFIER, SENSITIVE). Enterprise Edition.", "icon": "policy"},
     {"name": "System tags", "description": "SNOWFLAKE.CORE.SEMANTIC_CATEGORY and PRIVACY_CATEGORY record classification results on columns, and tag-based masking can key off them.", "icon": "sell"},
