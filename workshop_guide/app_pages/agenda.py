@@ -11,8 +11,7 @@ LAB_PATH = [
     ("9:40", "Part 1, Modules 1 to 3", "60 min"),
     ("10:40", "Short break", "10 min"),
     ("10:50", "Part 1, Module 4: plugin sharing and automated PR review", "30 min"),
-    ("11:20", "Part 2 showcase, optional hands-on: A1 to A6", "30 min"),
-    ("11:50", "A7: putting these workflows on a schedule (demo)", "5 min"),
+    ("11:20", "Part 2 showcase, optional hands-on: A1 to A7", "35 min"),
     ("11:55", "Recap; teams pick hackathon topics", "5 min"),
 ]
 with st.container(border=True):
