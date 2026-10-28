@@ -7,12 +7,10 @@ st.space("small")
 
 st.markdown("#### Lab run order (9:30 AM to 12:00 PM PST, tentative)")
 LAB_PATH = [
-    ("9:30", "Intro and setup check", "10 min"),
-    ("9:40", "Part 1, Modules 1 to 3", "60 min"),
-    ("10:40", "Short break", "10 min"),
-    ("10:50", "Part 1, Module 4: plugin sharing and automated PR review", "30 min"),
-    ("11:20", "Part 2 showcase, optional hands-on: A1 to A7", "35 min"),
-    ("11:55", "Recap; teams pick hackathon topics", "5 min"),
+    ("9:30", "Intro and setup check", "15 min"),
+    ("9:45", "Part 1, Modules 1 to 3", "60 min"),
+    ("10:45", "Part 1, Module 4: plugin sharing and automated PR review", "30 min"),
+    ("11:15", "Part 2 showcase, optional hands-on: A1 to A7, then a quick recap", "45 min"),
 ]
 with st.container(border=True):
     for time, title, dur in LAB_PATH:
