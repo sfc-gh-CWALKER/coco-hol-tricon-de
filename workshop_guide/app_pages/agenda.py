@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("Agenda")
-st.markdown("A 2.5-hour guided lab. Everyone does Part 1 and A1 hands-on, then the facilitator showcases every other Part 2 workflow live. Follow along if you like; any workflow can become your afternoon hackathon project.")
+st.markdown("A 2.5-hour guided lab. Everyone does Part 1 hands-on (Jeremiah Hansen's guide). Part 2 is optional: the facilitator showcases each workflow live, and you can try them yourself if you have time. Any workflow can become your afternoon hackathon project.")
 
 st.space("small")
 
@@ -10,9 +10,8 @@ LAB_PATH = [
     ("9:30", "Intro and setup check", "10 min"),
     ("9:40", "Part 1, Modules 1 to 3", "60 min"),
     ("10:40", "Short break", "10 min"),
-    ("10:50", "A1 dbt upkeep: triage the failing test, propose a fix, approve, rerun", "20 min"),
-    ("11:10", "Part 1, Module 4: plugin sharing and automated PR review", "10 min"),
-    ("11:20", "Part 2 showcase (live demo): A2, A3, A4, A5, A6", "30 min"),
+    ("10:50", "Part 1, Module 4: plugin sharing and automated PR review", "30 min"),
+    ("11:20", "Part 2 showcase, optional hands-on: A1 to A6", "30 min"),
     ("11:50", "A7: putting these workflows on a schedule (demo)", "5 min"),
     ("11:55", "Recap; teams pick hackathon topics", "5 min"),
 ]
@@ -25,13 +24,13 @@ st.caption("Finish the Getting Started readiness check before lab day; the plan 
 
 st.space("medium")
 
-st.markdown("#### Part 1: Engineering standards (everyone, ~75 min)")
+st.markdown("#### Part 1: Engineering standards (everyone, ~90 min)")
 st.markdown("Follows Jeremiah Hansen's guide. You build the pieces that every Part 2 workflow reuses.")
 PART1 = [
     ("1", "Give CoCo your project context", "AGENTS.md and a conventions audit", "15 min"),
     ("2", "Turn a standard into a skill", "Schema tests, then a `new-dbt-model` skill", "20 min"),
     ("3", "Package it as a plugin", "Prod-safety hook and a `dbt-review` subagent", "25 min"),
-    ("4", "Share it and run it in CI", "Plugins Catalog and GitHub Actions", "15 min"),
+    ("4", "Share it and run it in CI", "Plugins Catalog and GitHub Actions", "30 min"),
 ]
 with st.container(border=True):
     for key, title, detail, dur in PART1:
@@ -41,8 +40,8 @@ with st.container(border=True):
 
 st.space("medium")
 
-st.markdown("#### Part 2: Automating Tricon's workflows (A1 hands-on, the rest showcased live)")
-st.markdown("These are the tasks Tricon asked to automate, grouped the same way.")
+st.markdown("#### Part 2: Automating Tricon's workflows (optional: showcased live, try them if you have time)")
+st.markdown("These are the tasks Tricon asked to automate, grouped the same way. If there's no time to build them in the lab, treat them as hackathon ideas.")
 
 PART2 = [
     ("Data engineering", [
