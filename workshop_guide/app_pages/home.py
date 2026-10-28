@@ -31,7 +31,7 @@ with st.container(border=True):
 | Cost and performance | Warehouse right-sizing and/or Adaptive Warehouses | A6 |
 | All | Putting these workflows on a schedule | A7 |
 
-**Speakers:** Jeremiah Hansen (Snowflake), author of the Data Engineering with CoCo guide, and Johnathan, Financial & Retail SME.
+**Speakers:** Jeremiah Hansen (Snowflake), author of the Data Engineering with CoCo guide, and Jonathan Regenstein (Snowflake), Industry Principal, Wealth & Asset Management.
 """)
 
 st.space("small")
