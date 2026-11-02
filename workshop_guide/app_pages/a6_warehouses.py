@@ -3,7 +3,7 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A6", "Warehouse Right-Sizing & Adaptive Warehouses", "15 min", "warehouse-advisor subagent and an Adaptive Warehouse evaluation for COMPUTE_WH")
 
-st.info(":material/key: **Requires the `TRICON_DE_REVIEWER` role** (usage and query-history metadata). Changing a warehouse stays with Tricon's Snowflake admin.")
+st.info(":material/key: **Requires the `DEMO_REVIEWER` role** (usage and query-history metadata). Changing a warehouse stays with Tricon's Snowflake admin.")
 
 st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
@@ -13,12 +13,12 @@ render_technologies_used([
     {"name": "Adaptive Warehouses", "description": "Snowflake sizes and scales compute per query. You set MAX_QUERY_PERFORMANCE_LEVEL and QUERY_THROUGHPUT_MULTIPLIER instead of size and clusters. Enterprise Edition, select regions.", "icon": "auto_mode"},
 ])
 
-PROMPT_A6_1 = """Create a subagent at .cortex/plugins/tricon-de/agents/warehouse-advisor.md named warehouse-advisor.
+PROMPT_A6_1 = """Create a subagent at .cortex/plugins/coco-de-guide/agents/warehouse-advisor.md named warehouse-advisor.
 Description: Find warehouses with heavy spilling, long queueing, or long idle periods and recommend size, auto-suspend, cluster, or Adaptive Warehouse changes. Report only.
 Tools: bash, read, write. Model: auto.
 
 Behavior:
-1. Use role TRICON_DE_REVIEWER. Look back 30 days (configurable).
+1. Use role DEMO_REVIEWER. Look back 30 days (configurable).
 2. Per warehouse, from SNOWFLAKE.ACCOUNT_USAGE:
    - credits (WAREHOUSE_METERING_HISTORY), query count, p50/p95 elapsed time
    - % of queries with local spill and with remote spill, total GB spilled (QUERY_HISTORY)
@@ -49,7 +49,7 @@ An **Adaptive Warehouse** removes the size, multi-cluster, and auto-suspend tuni
 Converting is an online operation (`ALTER WAREHOUSE ... SET WAREHOUSE_TYPE = 'ADAPTIVE'`) and can be reversed (`'STANDARD'`). Billing is per query. Budgets and resource monitors still apply.
 """)
 
-PROMPT_A6_3 = """Using role TRICON_DE_REVIEWER, evaluate whether COMPUTE_WH is a good candidate for an Adaptive Warehouse. Do not change anything.
+PROMPT_A6_3 = """Using role DEMO_REVIEWER, evaluate whether COMPUTE_WH is a good candidate for an Adaptive Warehouse. Do not change anything.
 1. Confirm prerequisites: account edition and whether our cloud region supports Adaptive Warehouses (check the docs), and COMPUTE_WH's current type and size
 2. Profile the last 30 days: query mix by type and user, spread of bytes scanned and duration (is this a mixed BI + ETL workload?), queueing, spilling, credits
 3. Note any blockers: HTAP-heavy use, very-low-latency dashboard queries (interactive warehouses fit better), Snowpark-optimized needs
@@ -60,16 +60,16 @@ Write it to proposals/adaptive-compute_wh-<YYYY-MM-DD>.md."""
 
 render_prompt("Prompt A6.3", "Evaluate COMPUTE_WH for Adaptive", PROMPT_A6_3)
 
-render_guardrail("Warehouse changes affect cost and every workload on the warehouse. The lab role can't run `ALTER WAREHOUSE`. The proposal goes to Tricon's Snowflake admin, who can run a one-week pilot with the rollback statement ready.")
+render_guardrail("Warehouse changes affect cost and every workload on the warehouse. `DEMO_ROLE` only owns the workshop's `DEMO_WH`; it can't change `COMPUTE_WH` or any other warehouse. The proposal goes to Tricon's Snowflake admin, who can run a one-week pilot with the rollback statement ready.")
 
 render_explanation("Facilitator demo (optional)", """
-If the admin set up `TRICON_DE_ADAPTIVE_DEMO_WH` (see `admin/03_optional.sql`, block 3c), the facilitator can show the conversion live:
+If the admin set up `DEMO_ADAPTIVE_WH` (see `part2/admin_optional.sql`), the facilitator can show the conversion live:
 
 ```sql
-SHOW WAREHOUSES LIKE 'TRICON_DE_ADAPTIVE_DEMO_WH';
-ALTER WAREHOUSE TRICON_DE_ADAPTIVE_DEMO_WH SET WAREHOUSE_TYPE = 'ADAPTIVE';
-SHOW WAREHOUSES LIKE 'TRICON_DE_ADAPTIVE_DEMO_WH';   -- note MAX_QUERY_PERFORMANCE_LEVEL, QUERY_THROUGHPUT_MULTIPLIER
-ALTER WAREHOUSE TRICON_DE_ADAPTIVE_DEMO_WH SET WAREHOUSE_TYPE = 'STANDARD';   -- rollback
+SHOW WAREHOUSES LIKE 'DEMO_ADAPTIVE_WH';
+ALTER WAREHOUSE DEMO_ADAPTIVE_WH SET WAREHOUSE_TYPE = 'ADAPTIVE';
+SHOW WAREHOUSES LIKE 'DEMO_ADAPTIVE_WH';   -- note MAX_QUERY_PERFORMANCE_LEVEL, QUERY_THROUGHPUT_MULTIPLIER
+ALTER WAREHOUSE DEMO_ADAPTIVE_WH SET WAREHOUSE_TYPE = 'STANDARD';   -- rollback
 ```
 
 Snowflake derives the Adaptive settings from the warehouse's existing size, cluster count, and QAS configuration.

@@ -96,10 +96,10 @@ st.markdown("""
 | Artifact | Where |
 |----------|-------|
 | `AGENTS.md` | Project root |
-| `tricon-de` plugin: `new-dbt-model` and `dbt-test-triage` skills, prod-safety hook, `dbt-review` subagent | `.cortex/plugins/tricon-de/` |
-| Automation subagents: classification sweep, access review, KPI report, anomaly explainer, warehouse advisor | `.cortex/plugins/tricon-de/agents/` |
-| dbt models, tests, and a semantic view in your own schema | `TRICON_DE.DBT_<INITIALS>` |
+| `coco-de-guide` plugin: `new-dbt-model` and `dbt-test-triage` skills, prod-safety hook, `dbt-review` subagent | `.cortex/plugins/coco-de-guide/` |
+| Automation subagents: classification sweep, access review, KPI report, anomaly explainer, warehouse advisor | `.cortex/plugins/coco-de-guide/agents/` |
+| dbt models, tests, and a semantic view in your own schema | `DEMO_DB.TPCH_<INITIALS>` |
 | Proposal files for every approval step | `proposals/` |
 | Optional GitHub Actions PR review | `.github/workflows/pr-review.yml` |
 """)
-st.caption("Stuck? Reference versions of every skill and subagent are in `solutions/tricon-de-plugin/` in the repo.")
+st.caption("Stuck? Reference versions of every skill and subagent are in `part2/solutions/coco-de-guide/` in the repo.")

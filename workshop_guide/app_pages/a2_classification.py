@@ -1,5 +1,5 @@
 import streamlit as st
-from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_guardrail
+from components import render_session_header, render_prompt, render_explanation, render_technologies_used, render_key_concepts, render_what_you_built, render_guardrail, render_code, render_expected
 
 render_session_header("A2", "Sensitive Data Classification Sweep", "15 min", "classification-sweep subagent: classify new tables, propose tags and masking, route for approval")
 
@@ -12,11 +12,18 @@ render_technologies_used([
 ])
 
 st.markdown("""
-**The data:** `dbt seed` in Getting Started loaded `RESIDENT_CONTACTS` into your schema: 40 synthetic residents with names, emails, phones, birth dates, addresses, income, IP addresses, and free-text service notes. It's fake, but shaped like the real thing.
-""")
+**The data:** 40 synthetic residents with names, emails, phones, birth dates, addresses, income, IP addresses, and free-text service notes. It's fake, but shaped like the real thing.
+It isn't part of the guide's dbt project, so load it once into your schema:
 
-PROMPT_A2_1 = """In TRICON_DE.DBT_<INITIALS>, run:
-CALL SYSTEM$CLASSIFY('TRICON_DE.DBT_<INITIALS>.RESIDENT_CONTACTS', {'sample_count': 40});
+1. In CoCo Desktop, open **`part2/resident_contacts.sql`**.
+2. Change `XX` to the same initials you used in `scripts/setup.sql`:
+""")
+render_code(f"SET MY_INITIALS = '{st.session_state.get('initials', '').strip().upper() or 'XX'}';", language="sql")
+st.markdown("3. **Run all** (`CMD/CTRL+Shift+Enter`).")
+render_expected("A count of **40**, in `DEMO_DB.TPCH_<INITIALS>.RESIDENT_CONTACTS`.")
+
+PROMPT_A2_1 = """In DEMO_DB.TPCH_<INITIALS>, run:
+CALL SYSTEM$CLASSIFY('DEMO_DB.TPCH_<INITIALS>.RESIDENT_CONTACTS', {'sample_count': 40});
 
 Do NOT use auto_tag. Summarize the result as a table: column, semantic category, privacy category, confidence.
 Then list any columns that standard classification did not flag but that a property manager would still
@@ -30,7 +37,7 @@ Standard classification is pattern-based. It reliably catches emails, phones, na
 `{'ai_mode': true}` (preview) uses an LLM to find more categories. Try it if your account allows it.
 """)
 
-PROMPT_A2_2 = """Create a subagent at .cortex/plugins/tricon-de/agents/classification-sweep.md named classification-sweep.
+PROMPT_A2_2 = """Create a subagent at .cortex/plugins/coco-de-guide/agents/classification-sweep.md named classification-sweep.
 Description: Sweep a schema for new or changed tables, classify sensitive columns, and propose tags and masking policies for human approval.
 Tools: bash, read, write, grep, glob. Model: auto.
 
@@ -41,7 +48,7 @@ Behavior:
 4. For every column with a privacy category, plus any free-text column likely to hold sensitive content, propose:
    - ALTER TABLE ... MODIFY COLUMN ... SET TAG statements for SNOWFLAKE.CORE.SEMANTIC_CATEGORY and PRIVACY_CATEGORY
    - One masking policy per data type (string, date, number) that returns the raw value only when
-     IS_ROLE_IN_SESSION('TRICON_DE_PII_READER') is true, with partial masking for email and phone
+     IS_ROLE_IN_SESSION('DEMO_PII_READER') is true, with partial masking for email and phone
    - ALTER TABLE ... MODIFY COLUMN ... SET MASKING POLICY statements
 5. Write two files: proposals/classification-<schema>-<YYYY-MM-DD>.md (findings table, rationale, open questions
    for the data owner) and proposals/classification-<schema>-<YYYY-MM-DD>.sql (all proposed DDL, commented with which finding it addresses)
@@ -49,10 +56,10 @@ Behavior:
 
 render_prompt("Prompt A2.2", "Create the classification-sweep Subagent", PROMPT_A2_2)
 
-PROMPT_A2_3 = """Use the classification-sweep agent on TRICON_DE.DBT_<INITIALS>.
+PROMPT_A2_3 = """Use the classification-sweep agent on DEMO_DB.TPCH_<INITIALS>.
 
 After it finishes, I'll review the proposal. Once I say approve, apply the approved DDL ONLY to
-TRICON_DE.DBT_<INITIALS> (my sandbox), then show me SELECT * FROM RESIDENT_CONTACTS LIMIT 5 so I can confirm the masking."""
+DEMO_DB.TPCH_<INITIALS> (my sandbox), then show me SELECT * FROM RESIDENT_CONTACTS LIMIT 5 so I can confirm the masking."""
 
 render_prompt("Prompt A2.3", "Sweep, Approve, Apply in Your Sandbox", PROMPT_A2_3)
 
@@ -61,7 +68,7 @@ render_guardrail("In the lab, *you* are the approver for your own sandbox schema
 render_explanation("If applying the masking policy fails", """
 Many accounts use **centralized policy management**: only a governance role holds `APPLY MASKING POLICY`. If the apply step fails with a privilege error, that's the control working as designed. Hand the `.sql` proposal to whoever owns policies.
 
-`TRICON_DE_PII_READER` doesn't need to exist for the policy to be valid. Until someone has that role, everyone sees masked values.
+`DEMO_PII_READER` doesn't need to exist for the policy to be valid. Until someone has that role, everyone sees masked values.
 """)
 
 render_key_concepts([

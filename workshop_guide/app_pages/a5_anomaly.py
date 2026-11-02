@@ -13,12 +13,12 @@ render_technologies_used([
     {"name": "Cortex Analyst", "description": "Every breakdown goes through the semantic view, so the metric definition stays consistent.", "icon": "chat"},
 ])
 
-PROMPT_A5_1 = """Create a subagent at .cortex/plugins/tricon-de/agents/anomaly-explainer.md named anomaly-explainer.
+PROMPT_A5_1 = """Create a subagent at .cortex/plugins/coco-de-guide/agents/anomaly-explainer.md named anomaly-explainer.
 Description: When a KPI moves more than X% period over period, break it down by dimension and explain what drove the change.
 Tools: bash, read, write. Model: auto.
 
 Behavior:
-1. Inputs: semantic view (default TRICON_DE.DBT_<INITIALS>.SALES_KPI_VIEW), metric (default net_revenue),
+1. Inputs: semantic view (default DEMO_DB.TPCH_<INITIALS>.SALES_KPI_VIEW), metric (default net_revenue),
    current period, comparison period, threshold X (default 5%)
 2. Compute the change. If |change| <= X, say there is no anomaly, show the change, and stop.
 3. Normalization first: compare the per-day metric and the number of days in each period; check for partial periods.

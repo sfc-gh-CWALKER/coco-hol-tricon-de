@@ -50,4 +50,4 @@ st.markdown("""
 - Add Tricon's break-glass allow-list and a month-over-month diff to `access-review`.
 - Run `warehouse-advisor`, then pilot an Adaptive Warehouse on COMPUTE_WH for one week with before/after metrics.
 """)
-st.caption("Reference versions of every skill and subagent: `solutions/tricon-de-plugin/` in the repo.")
+st.caption("Reference versions of every skill and subagent: `part2/solutions/coco-de-guide/` in the repo.")

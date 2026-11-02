@@ -7,7 +7,7 @@ st.space("small")
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Modules", "4 + 7", help="4 core engineering modules plus 7 automation workflows")
-col2.metric("Prompts", "28", help="Cortex Code prompts across all modules")
+col2.metric("Prompts", "27", help="Cortex Code prompts across all modules")
 col3.metric("Lab time", "2.5 hrs", help="Part 1 hands-on, plus a Part 2 showcase you can try if time allows")
 
 st.space("medium")
@@ -17,7 +17,7 @@ with st.container(border=True):
     st.markdown("""
 > Anyone can get an AI agent to produce a result. Professionals ensure the right result, every time.
 
-**Part 1** follows Jeremiah Hansen's Snowflake guide, [Data Engineering with CoCo](https://www.snowflake.com/en/developers/guides/data-engineering-with-coco/). You encode team standards in an `AGENTS.md`, a custom skill, and a plugin with a production-safety hook and a dbt review subagent, then run that same subagent in CI/CD.
+**Part 1** is Jeremiah Hansen's Snowflake guide, [Data Engineering with CoCo](https://www.snowflake.com/en/developers/guides/data-engineering-with-coco/), step by step and prompt for prompt. The only change: everyone builds in their own schema, `DEMO_DB.TPCH_<INITIALS>`, so 30+ people can run it on one account. You encode team standards in an `AGENTS.md`, a custom skill, and a plugin with a production-safety hook and a dbt review subagent, then run that same subagent in CI/CD.
 
 **Part 2** reuses the same pattern for the tasks Tricon asked to automate:
 
@@ -41,9 +41,9 @@ with st.container(border=True):
     st.markdown("""
 Every Part 2 workflow **proposes**; a person **approves**. The agents draft fixes, policies, findings, and SQL — they never revoke access, apply masking to shared data, resize production warehouses, or push to `main` on their own. This lab builds that boundary in three layers:
 
-1. **Least-privilege roles** — the lab role can only create objects inside the `TRICON_DE` lab database, and `AGENTS.md` keeps CoCo in your own schema.
-2. **A PreToolUse hook** — blocks `dbt ... --target prod` before CoCo can run it.
-3. **Approval steps in every skill and subagent** — outputs are written as proposals for review.
+1. **Least-privilege roles**: the workshop role `DEMO_ROLE` can only create objects in `DEMO_DB` and use `DEMO_WH`, and `AGENTS.md` plus your dbt profile keep CoCo in your own schema.
+2. **A PreToolUse hook**: blocks `dbt ... --target prod` before CoCo can run it.
+3. **Approval steps in every skill and subagent**: outputs are written as proposals for review.
 """)
 
 st.space("small")
@@ -52,9 +52,10 @@ st.markdown("#### Prerequisites")
 with st.container(border=True):
     st.markdown("""
 - Familiarity with dbt (models, sources, tests), Snowflake, and Git
-- **Getting Started** finished before lab day: CoCo Desktop, Git, and dbt installed, your dbt profile created, and the 6-row self-check passing
-- Your row from the admin's lab user list, typed into the **sidebar** (initials, sign-in type, username, account)
-- Optional for modules A3 and A6: the `TRICON_DE_REVIEWER` role (read-only account metadata)
+- **Getting Started** finished before lab day: CoCo Desktop, Git and dbt installed, your schema created with `scripts/setup.sql`, a PAT, and `dbt debug` passing
+- Your initials, Snowflake username and account typed into the **sidebar**
+- Optional, for Module 4's CI/CD: a GitHub account to fork the repo
+- Optional, for modules A3 and A6: the `DEMO_REVIEWER` role (read-only account metadata)
 
 Stuck at any point? **Help & Troubleshooting** in the menu lists every known symptom and its fix.
 """)

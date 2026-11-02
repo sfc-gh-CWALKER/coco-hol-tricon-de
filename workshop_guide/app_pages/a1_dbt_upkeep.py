@@ -22,7 +22,7 @@ arguments: key. Then run dbt build --project-dir dbt/ and show me which tests fa
 render_prompt("Prompt A1.1", "Plant the Failing Test", PROMPT_A1_1)
 st.caption("Expected: the accepted_values test fails because TPC-H also contains status 'P' (partially fulfilled orders).")
 
-PROMPT_A1_2 = """Create a skill at .cortex/plugins/tricon-de/skills/dbt-test-triage/SKILL.md named dbt-test-triage.
+PROMPT_A1_2 = """Create a skill at .cortex/plugins/coco-de-guide/skills/dbt-test-triage/SKILL.md named dbt-test-triage.
 Description: Triage failing dbt tests after a build and draft fixes for simple failures. Use when dbt build fails or for routine project upkeep.
 
 # Conventions
@@ -62,7 +62,7 @@ render_key_concepts([
 ])
 
 render_what_you_built([
-    "dbt-test-triage skill in the tricon-de plugin",
+    "dbt-test-triage skill in the coco-de-guide plugin",
     "Triage report in proposals/ with classified failures",
     "Approved fix on a fix/ branch, rebuilt and committed",
 ])

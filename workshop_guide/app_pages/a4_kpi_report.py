@@ -11,7 +11,7 @@ render_technologies_used([
     {"name": "HTML report / email", "description": "A self-contained HTML file written locally, or sent through SYSTEM$SEND_EMAIL with an admin-approved notification integration.", "icon": "summarize"},
 ])
 
-PROMPT_A4_1 = """Create a semantic view TRICON_DE.DBT_<INITIALS>.SALES_KPI_VIEW over my dbt models ORDERS_SUMMARY and CUSTOMERS.
+PROMPT_A4_1 = """Create a semantic view DEMO_DB.TPCH_<INITIALS>.SALES_KPI_VIEW over my dbt models ORDERS_SUMMARY and CUSTOMERS.
 - Relationship: ORDERS_SUMMARY.CUSTOMER_KEY -> CUSTOMERS.CUSTOMER_KEY (left = ORDERS_SUMMARY, right = CUSTOMERS;
   primary key CUSTOMER_KEY on CUSTOMERS; do not specify join_type)
 - Dimensions: ORDER_DATE (time), ORDER_STATUS, ORDER_PRIORITY, REGION, NATION, MARKET_SEGMENT
@@ -23,12 +23,12 @@ Execute it, then ask Cortex Analyst: "What was net revenue by region last month?
 
 render_prompt("Prompt A4.1", "Create the Semantic View", PROMPT_A4_1)
 
-PROMPT_A4_2 = """Create a subagent at .cortex/plugins/tricon-de/agents/kpi-report.md named kpi-report.
+PROMPT_A4_2 = """Create a subagent at .cortex/plugins/coco-de-guide/agents/kpi-report.md named kpi-report.
 Description: Produce the recurring KPI report from a semantic view with a written narrative, as a self-contained HTML file.
 Tools: bash, read, write. Model: auto.
 
 Behavior:
-1. Input: semantic view (default TRICON_DE.DBT_<INITIALS>.SALES_KPI_VIEW) and reporting month (default: latest complete month)
+1. Input: semantic view (default DEMO_DB.TPCH_<INITIALS>.SALES_KPI_VIEW) and reporting month (default: latest complete month)
 2. Ask Cortex Analyst for: net revenue, order count, avg order value, and active customers for the month, prior month,
    and same month last year; net revenue by region and by market segment; top 5 nations by revenue growth
 3. Only use numbers returned by those queries. Never estimate or invent figures. Keep the SQL for each number.
@@ -36,7 +36,7 @@ Behavior:
 5. Write reports/kpi-<YYYY-MM>.html: self-contained (inline CSS, no external scripts), with KPI cards, a MoM/YoY table,
    the narrative, and an appendix with the SQL behind every number
 6. Email is OPTIONAL and only on my explicit approval: if I say "send it", call SYSTEM$SEND_EMAIL with integration
-   TRICON_DE_EMAIL_INT to the address I give, with the narrative as the body and the report path noted"""
+   DEMO_EMAIL_INT to the address I give, with the narrative as the body and the report path noted"""
 
 render_prompt("Prompt A4.2", "Create the kpi-report Subagent", PROMPT_A4_2)
 
@@ -45,7 +45,7 @@ PROMPT_A4_3 = """Use the kpi-report agent for July 1998, then open the HTML repo
 render_prompt("Prompt A4.3", "Generate the Report", PROMPT_A4_3)
 st.caption("Tip: run `coco reports/` in the terminal, or open the file from the Explorer.")
 
-render_guardrail("Read the numbers and narrative before sending anything. Emails go out only when you say *send it*, and only through the admin-created `TRICON_DE_EMAIL_INT` integration. Snowflake email integrations can only send to verified users' addresses.")
+render_guardrail("Read the numbers and narrative before sending anything. Emails go out only when you say *send it*, and only through the admin-created `DEMO_EMAIL_INT` integration. Snowflake email integrations can only send to verified users' addresses.")
 
 render_explanation("Bring it to Tricon data", """
 The same pattern works on a Tricon semantic view of occupancy, rent growth, turnover, and delinquency. That's how this lab connects to the Power BI reporting work: define the KPI once in the semantic view, and the report, the agent, and Cortex Analyst all agree with Power BI. Reconcile a few numbers against the existing Power BI report before trusting it.

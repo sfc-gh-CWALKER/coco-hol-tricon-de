@@ -2,7 +2,7 @@ import streamlit as st
 
 # Prompt ids per module; a module shows a check in the sidebar once all are done.
 SESSION_PROMPTS = {
-    "1": ["Prompt 1.1", "Prompt 1.2", "Prompt 1.3"],
+    "1": ["Prompt 1.1", "Prompt 1.2"],
     "2": ["Prompt 2.1", "Prompt 2.2", "Prompt 2.3"],
     "3": ["Prompt 3.1", "Prompt 3.2", "Prompt 3.3", "Prompt 3.4", "Prompt 3.5"],
     "4": ["Prompt 4.1"],
@@ -14,68 +14,70 @@ SESSION_PROMPTS = {
     "A6": ["Prompt A6.1", "Prompt A6.2", "Prompt A6.3"],
 }
 
+# Shared objects from the guide, created once by the workshop admin (scripts/admin_setup.sql).
+LAB_ROLE = "DEMO_ROLE"
+LAB_WH = "DEMO_WH"
+LAB_DB = "DEMO_DB"
+PLUGIN = "coco-de-guide"
+REVIEWER_ROLE = "DEMO_REVIEWER"
+
+# The workshop fork of Jeremiah Hansen's guide repo. Attendees fork this one.
+REPO_OWNER = "sfc-gh-CWALKER"
+REPO_NAME = "sfguide-data-engineering-with-coco"
+REPO_URL = f"https://github.com/{REPO_OWNER}/{REPO_NAME}"
+GUIDE_URL = "https://www.snowflake.com/en/developers/guides/data-engineering-with-coco/"
+
 INITIALS_PLACEHOLDER = "<INITIALS>"
-ACCOUNT_PLACEHOLDER = "<TRICON_ACCOUNT_IDENTIFIER>"
-USER_PLACEHOLDER = "<YOUR_SNOWFLAKE_USERNAME>"
-LOGIN_USUAL = "My usual Tricon Snowflake login"
-LOGIN_TEMP = "A temporary lab login (TRICON_DE_...)"
+ACCOUNT_PLACEHOLDER = "<YOUR_ACCOUNT>"
+USER_PLACEHOLDER = "<YOUR_USERNAME>"
+GITHUB_PLACEHOLDER = "<YOUR_GITHUB_USERNAME>"
 
 # Sidebar values that are mirrored into the URL so a browser refresh keeps them.
-PERSISTED_KEYS = ("initials", "login_type", "sf_user", "sf_account")
+PERSISTED_KEYS = ("initials", "sf_user", "sf_account", "gh_user")
 
 
 def attendee_initials() -> str:
-    return "".join(c for c in st.session_state.get("initials", "") if c.isalnum()).upper()
+    return "".join(c for c in st.session_state.get("initials", "") if c.isalpha()).upper()
 
 
 def attendee_account() -> str:
     return st.session_state.get("sf_account", "").strip() or ACCOUNT_PLACEHOLDER
 
 
-def uses_temp_login() -> bool:
-    return st.session_state.get("login_type") == LOGIN_TEMP
-
-
 def attendee_user() -> str:
-    """Snowflake login name: typed by the attendee, or TRICON_DE_<INITIALS> for temporary lab logins."""
-    typed = st.session_state.get("sf_user", "").strip().upper()
-    if typed:
-        return typed
-    if uses_temp_login():
-        return f"TRICON_DE_{attendee_initials() or INITIALS_PLACEHOLDER}"
-    return USER_PLACEHOLDER
+    return st.session_state.get("sf_user", "").strip().upper() or USER_PLACEHOLDER
+
+
+def attendee_github() -> str:
+    return st.session_state.get("gh_user", "").strip() or GITHUB_PLACEHOLDER
 
 
 def setup_complete() -> bool:
-    return bool(attendee_initials()) and attendee_account() != ACCOUNT_PLACEHOLDER and attendee_user() != USER_PLACEHOLDER
+    return (len(attendee_initials()) >= 2 and attendee_account() != ACCOUNT_PLACEHOLDER
+            and attendee_user() != USER_PLACEHOLDER)
 
 
-def profiles_yml(authenticator: str = "oauth_authorization_code") -> str:
-    """Personalized dbt profile. Lives at the project root, so ~/.dbt/profiles.yml is never touched."""
-    auth_lines = {
-        "oauth_authorization_code": "      authenticator: oauth_authorization_code   # browser sign-in; nothing stored",
-        "externalbrowser": "      authenticator: externalbrowser            # Tricon SSO in a browser pop-up",
-        "username_password_mfa": "      authenticator: username_password_mfa\n      password: \"{{ env_var('SNOWFLAKE_PASSWORD') }}\"   # read from your terminal, never saved",
-    }[authenticator]
-    return f"""tricon_de:
+def attendee_schema() -> str:
+    """Per-attendee schema in the shared DEMO_DB; replaces the guide's TPCH_TRANSFORMED."""
+    return f"TPCH_{attendee_initials() or INITIALS_PLACEHOLDER}"
+
+
+def profiles_yml() -> str:
+    """The guide's ~/.dbt/profiles.yml block with this attendee's values filled in."""
+    return f"""coco_de_guide:
   target: dev
   outputs:
     dev:
       type: snowflake
       account: "{attendee_account()}"
       user: "{attendee_user()}"
-{auth_lines}
-      role: TRICON_DE_ROLE
-      database: TRICON_DE
-      warehouse: TRICON_DE_WH
+      password: "<YOUR_PERSONAL_ACCESS_TOKEN>"
+      role: {LAB_ROLE}
+      database: {LAB_DB}
+      warehouse: {LAB_WH}
       schema: {attendee_schema()}
       threads: 4
 """
-
-
-def attendee_schema() -> str:
-    """Per-attendee dbt schema in the shared TRICON_DE database, e.g. DBT_CW."""
-    return f"DBT_{attendee_initials() or INITIALS_PLACEHOLDER}"
 
 
 def personalize(text: str) -> str:
@@ -86,6 +88,8 @@ def personalize(text: str) -> str:
         text = text.replace(ACCOUNT_PLACEHOLDER, attendee_account())
     if attendee_user() != USER_PLACEHOLDER:
         text = text.replace(USER_PLACEHOLDER, attendee_user())
+    if attendee_github() != GITHUB_PLACEHOLDER:
+        text = text.replace(GITHUB_PLACEHOLDER, attendee_github())
     return text
 
 
@@ -181,8 +185,13 @@ def render_before_you_start(items: list[str]):
 def render_guide_change(original: str, tricon: str, why: str):
     """Callout marking a deliberate difference from Jeremiah Hansen's original guide."""
     with st.container(border=True):
-        st.markdown(":orange-badge[:material/edit_note: Adjusted for Tricon]")
-        st.markdown(personalize(f"**Original guide:** {original}  \n**This lab:** {tricon}  \n**Why:** {why}"))
+        st.markdown(":orange-badge[:material/edit_note: Workshop change]")
+        st.markdown(personalize(f"**Original guide:** {original}  \n**This workshop:** {tricon}  \n**Why:** {why}"))
+
+
+def render_same_as_guide(section: str):
+    """Marks a step that is word for word from the original guide (only your schema name is filled in)."""
+    st.caption(f":green-badge[:material/check: Same as the guide] Guide section: *{section}*")
 
 
 def render_new_for_tricon(text: str):

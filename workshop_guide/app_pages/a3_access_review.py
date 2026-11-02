@@ -3,7 +3,7 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A3", "Monthly Access Review", "10 min", "access-review subagent: excess privileges, dormant users, orphaned roles")
 
-st.info(":material/key: **Requires the `TRICON_DE_REVIEWER` role** (read-only account metadata, granted by your admin). Without it, follow along with the facilitator's demo, or build the subagent now and run it later.")
+st.info(":material/key: **Requires the `DEMO_REVIEWER` role** (read-only account metadata, granted by your admin). Without it, follow along with the facilitator's demo, or build the subagent now and run it later.")
 
 st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
@@ -13,12 +13,12 @@ render_technologies_used([
     {"name": "Report-only subagent", "description": "Finds issues and recommends actions. It never runs REVOKE, ALTER USER, or DROP ROLE.", "icon": "fact_check"},
 ])
 
-PROMPT_A3_1 = """Create a subagent at .cortex/plugins/tricon-de/agents/access-review.md named access-review.
+PROMPT_A3_1 = """Create a subagent at .cortex/plugins/coco-de-guide/agents/access-review.md named access-review.
 Description: Produce a monthly Snowflake access review: excess privileges, dormant users, and orphaned roles. Report only.
 Tools: bash, read, write. Model: auto.
 
 Behavior:
-1. Use role TRICON_DE_REVIEWER. Query SNOWFLAKE.ACCOUNT_USAGE (exclude deleted users and roles).
+1. Use role DEMO_REVIEWER. Query SNOWFLAKE.ACCOUNT_USAGE (exclude deleted users and roles).
 2. Excess privileges: users holding ACCOUNTADMIN, SECURITYADMIN, SYSADMIN, USERADMIN or ORGADMIN directly or through
    inheritance; roles granted OWNERSHIP or MANAGE GRANTS on the account; any grant of these admin roles to PUBLIC.
 3. Dormant users: enabled users with no successful login in 90 days, or who never logged in and were created more than 30 days ago.
@@ -46,7 +46,7 @@ render_explanation("Make it Tricon's", """
 
 render_key_concepts([
     {"term": "Why report-only", "definition": "A wrong REVOKE can break a pipeline or lock out an admin. Access changes stay with SECURITYADMIN under Tricon's change process."},
-    {"term": "Least privilege for the reviewer", "definition": "TRICON_DE_REVIEWER can read security metadata but can't change it. It's also sensitive: query history and grant lists reveal a lot, so grant it to admins only."},
+    {"term": "Least privilege for the reviewer", "definition": "DEMO_REVIEWER can read security metadata but can't change it. It's also sensitive: query history and grant lists reveal a lot, so grant it to admins only."},
 ])
 
 render_what_you_built([
