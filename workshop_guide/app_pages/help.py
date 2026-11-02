@@ -22,6 +22,7 @@ st.markdown(f"""
 | *Account not found* | Use `orgname-accountname` from Snowsight → your name → *Connect a tool to Snowflake* |
 | *Incorrect username or password* from dbt | `password:` in `~/.dbt/profiles.yml` must be the PAT itself, in quotes |
 | *Network policy is required* / *IP not allowed* | Connect to the company VPN, or switch the profile to `authenticator: externalbrowser` (Module 0, Step 6) |
+| Module 4 CI run is red: *IP ... is not allowed* | GitHub's runners aren't allowed in. Use the laptop fallback (Module 4, Step 5) |
 | CoCo Desktop: *access blocked* or no replies | CoCo may not be enabled for your user yet. Send the error to your admin |
 """)
 
