@@ -53,41 +53,42 @@ st.logo(
 )
 
 with st.sidebar:
-    st.markdown("**Your lab details**")
-    st.caption("Fills in every script, profile and prompt on these pages so you can copy them as-is. Nothing is sent or saved; this app isn't connected to Snowflake. Never type a password or token here.")
+    st.markdown("**Your initials**")
+    st.caption("The only thing you need to type. It fills in your schema in every script and prompt. Use the same initials in scripts/setup.sql. Nothing is sent or saved; never type a password or token here.")
     st.text_input(
         "Your initials",
         key="initials",
         max_chars=4,
         placeholder="e.g. CW",
-        help="2-4 letters. They name your own schema, TPCH_<initials>. Use the same initials in scripts/setup.sql. Press Enter to apply.",
+        label_visibility="collapsed",
+        help="2-4 letters. They name your own schema, TPCH_<initials>. If setup.sql says they're taken, add a letter and use the new initials here too. Press Enter to apply.",
         on_change=_sync_to_url,
     )
-    st.text_input(
-        "Snowflake username",
-        key="sf_user",
-        placeholder="e.g. JSMITH",
-        help="Snowsight → your name (bottom left) → Profile → Username.",
-        on_change=_sync_to_url,
-    )
-    st.text_input(
-        "Account identifier",
-        key="sf_account",
-        placeholder="e.g. myorg-myaccount",
-        help="Snowsight → your name → Connect a tool to Snowflake → Account identifier (orgname-accountname).",
-        on_change=_sync_to_url,
-    )
-    st.text_input(
-        "GitHub username (optional)",
-        key="gh_user",
-        placeholder="e.g. jsmith-tricon",
-        help="Fills in the clone command for your fork. Only needed if you fork the repo (required for Module 4 CI/CD).",
-        on_change=_sync_to_url,
-    )
+    with st.expander("Optional: pre-fill everything else"):
+        st.caption("`scripts/setup.sql` prints your username and account when it finishes, so you can skip these. Fill them in only if you want the dbt profile and CI secrets pre-filled too.")
+        st.text_input(
+            "Snowflake username",
+            key="sf_user",
+            placeholder="e.g. JSMITH",
+            on_change=_sync_to_url,
+        )
+        st.text_input(
+            "Account identifier",
+            key="sf_account",
+            placeholder="e.g. myorg-myaccount",
+            on_change=_sync_to_url,
+        )
+        st.text_input(
+            "GitHub username",
+            key="gh_user",
+            placeholder="e.g. jsmith-tricon",
+            help="Fills in the clone command for your fork (needed for Module 4 CI/CD).",
+            on_change=_sync_to_url,
+        )
     if setup_complete():
-        st.success(f"Every step now uses **{attendee_user()}** and your schema **`{LAB_DB}.{attendee_schema()}`**.", icon=":material/check_circle:")
+        st.success(f"Your schema everywhere: **`{LAB_DB}.{attendee_schema()}`**", icon=":material/check_circle:")
     else:
-        st.warning("Fill in your initials, username and account so every step is ready to copy.", icon=":material/edit:")
+        st.warning("Type your initials so every step is ready to copy.", icon=":material/edit:")
 
 page = st.navigation(
     {

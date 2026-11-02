@@ -53,8 +53,8 @@ def attendee_github() -> str:
 
 
 def setup_complete() -> bool:
-    return (len(attendee_initials()) >= 2 and attendee_account() != ACCOUNT_PLACEHOLDER
-            and attendee_user() != USER_PLACEHOLDER)
+    """Initials are the only required input; username and account are optional pre-fills."""
+    return len(attendee_initials()) >= 2
 
 
 def attendee_schema() -> str:

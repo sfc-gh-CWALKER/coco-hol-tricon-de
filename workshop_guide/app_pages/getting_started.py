@@ -28,7 +28,7 @@ The only change from the guide: everyone shares one Snowflake account, so each p
 """)
 
 if not setup_complete():
-    st.warning("**First, fill in the sidebar** (initials, Snowflake username, account). Every script and file below then fills itself in.", icon=":material/arrow_back:")
+    st.warning("**First, type your initials in the sidebar.** Every script and prompt below then uses your schema.", icon=":material/arrow_back:")
 
 # ---------------------------------------------------------------- Step 1
 st.markdown("#### Step 1: Fork and clone the guide repository")
@@ -107,17 +107,17 @@ Your admin already created the shared **{LAB_ROLE}**, **{LAB_WH}** and **{LAB_DB
 """)
     render_code(f"SET MY_INITIALS = '{st.session_state.get('initials', '').strip().upper() or 'XX'}';", language="sql")
     st.markdown("3. **Run all**: the down arrow next to the blue play button → *Run all*, or `CMD/CTRL+Shift+Enter`.")
-    render_expected(f"*Your schema `{LAB_DB}.{attendee_schema()}` is ready*, then a count of **1500000** orders.")
+    render_expected(f"One result row: *Ready: `{LAB_DB}.{attendee_schema()}` (sample data: 1500000 orders)*, followed by your **account**, **user** and **schema** for the dbt profile. Keep that row; you'll paste those values in Step 6.")
     render_guide_change(
         f"`setup.sql` creates the role, warehouse, database and one schema, `{LAB_DB}.TPCH_TRANSFORMED`.",
         f"The admin creates the shared objects once (`scripts/admin_setup.sql`). Your `setup.sql` creates only `{LAB_DB}.{attendee_schema()}`.",
         "With one shared schema, everyone's `dbt build` would replace everyone else's tables.")
     render_troubleshoot([
         ("*Set MY_INITIALS at the top of scripts/setup.sql...*", "You ran it with `XX`. Change it to your initials and Run all again."),
+        ("*Another participant already uses these initials...*", "Someone got there first. Add a letter (e.g. `CWA`) in `setup.sql`, Run all again, and type the **same new initials** in the sidebar."),
         (f"*Role '{LAB_ROLE}' ... not authorized* / *does not exist*", "Your admin hasn't granted you the role yet. Send them your username."),
         ("*Insufficient privileges to operate on database*", f"You ran it with a different role. Select **{LAB_ROLE}** at the top and run again."),
-        ("The count query fails", f"{LAB_ROLE} can't read `SNOWFLAKE_SAMPLE_DATA`. Ask your admin to run the sample-data grant in `scripts/admin_setup.sql`."),
-        ("Someone else already has your initials", "Add a letter (e.g. `CWA`), and use the same initials in the sidebar."),
+        ("*SNOWFLAKE_SAMPLE_DATA ... does not exist or not authorized*", f"{LAB_ROLE} can't read the sample data. Ask your admin to run the sample-data grant in `scripts/admin_setup.sql`."),
     ])
 
 # ---------------------------------------------------------------- Step 5
@@ -146,9 +146,7 @@ with st.container(border=True):
     st.markdown("dbt looks for `~/.dbt/profiles.yml`. If you don't have one yet, copy the example file. Run this in the CoCo Desktop terminal (it opens in the project folder):")
     render_code("""mkdir -p ~/.dbt
 cp dbt/profiles.yml.example ~/.dbt/profiles.yml""")
-    st.markdown("Open `~/.dbt/profiles.yml` (`CMD/CTRL+P`) and make the `coco_de_guide` block look like this. Paste your token over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
-    if not setup_complete():
-        st.error("Fill in the sidebar first, or the block below still has placeholders.", icon=":material/error:")
+    st.markdown("Open `~/.dbt/profiles.yml` (`CMD/CTRL+P`) and make the `coco_de_guide` block look like this. Fill in **account** and **user** from the row `setup.sql` printed in Step 4, and paste your token over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
     render_code(profiles_yml(), language="yaml")
     st.caption("If you already have a `~/.dbt/profiles.yml`, add this `coco_de_guide` block alongside your other profiles; they don't conflict. The file lives outside the repo, so your token can't be committed.")
     render_guide_change(
@@ -171,7 +169,7 @@ with st.container(border=True):
         (f"*Role '{LAB_ROLE}' specified in the connect string is not granted*", "The PAT was created for a different role. Create a new one with *Single role* → " + LAB_ROLE + "."),
         (f"*Schema '{LAB_DB}.TPCH_..' does not exist*", "Step 4 didn't run, or the initials in `profiles.yml` differ from the ones in `setup.sql`."),
         ("*Network policy is required* / *IP not allowed*", "Your account requires a network policy for PATs. Connect to the company VPN, or use the browser sign-in in Step 6."),
-        ("`<...>` in an error", "A placeholder is left in `profiles.yml`. Fill in the sidebar and copy the Step 6 block again."),
+        ("`<...>` in an error", "A placeholder is left in `profiles.yml`. Fill in account and user from the `setup.sql` result row (Step 4)."),
     ])
 
 st.space("small")
