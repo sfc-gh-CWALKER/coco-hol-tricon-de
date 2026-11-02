@@ -62,7 +62,7 @@ render_troubleshoot([
 st.space("small")
 st.markdown("#### Enforce standards automatically in CI/CD")
 st.markdown("The same dbt-review subagent you ran in Module 3, now running on every pull request. This part uses the **CoCo CLI**, which runs headlessly in GitHub Actions and auto-discovers `.cortex/plugins/` just like Desktop.")
-st.info(f":material/fork_right: You need **your own fork** of `{REPO_NAME}` (Getting Started, Step 1). Pull requests and secrets live on your fork, so every attendee's CI is separate.")
+st.info(f":material/fork_right: You need **your own fork** of `{REPO_NAME}` (Module 0, Step 1). Pull requests and secrets live on your fork, so every attendee's CI is separate.")
 
 st.markdown("##### Step 1: Configure GitHub secrets")
 render_same_as_guide("Enforce Standards Automatically in CI/CD → Configure GitHub Secrets")
@@ -73,7 +73,7 @@ In **your fork** on GitHub: **Settings → Secrets and variables → Actions →
 |---|---|
 | `SNOWFLAKE_ACCOUNT` | `{st.session_state.get('sf_account') or '<YOUR_ACCOUNT>'}` |
 | `SNOWFLAKE_USER` | `{attendee_user()}` |
-| `SNOWFLAKE_PASSWORD` | Your `DEMO_PAT` from Getting Started, Step 5 |
+| `SNOWFLAKE_PASSWORD` | Your `DEMO_PAT` from Module 0, Step 5 |
 """)
 
 st.warning(f"""
@@ -113,7 +113,7 @@ render_prompt("Prompt 4.1", "Create the PR Review Workflow", PROMPT_4_1)
 render_expected("A new `.github/workflows/pr-review.yml` with `fetch-depth: 0`, a step writing `~/.snowflake/connections.toml` from the three secrets, the CoCo CLI install, the `cortex --print` step, and a step posting `review.md` as a PR comment. Click **Keep**.")
 
 render_explanation("Why the role isn't in connections.toml", f"""
-The guide's workflow doesn't set a role. It doesn't need to: your `DEMO_PAT` is restricted to the single role **{LAB_ROLE}** (Getting Started, Step 5), so that's the role CI runs as.
+The guide's workflow doesn't set a role. It doesn't need to: your `DEMO_PAT` is restricted to the single role **{LAB_ROLE}** (Module 0, Step 5), so that's the role CI runs as.
 `fetch-depth: 0` is essential: the subagent diffs against `origin/main`, which needs full history.
 """)
 

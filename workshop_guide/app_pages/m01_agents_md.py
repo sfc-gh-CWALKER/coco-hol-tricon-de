@@ -50,7 +50,7 @@ Think of it as the onboarding document you'd write for a new team member, except
 st.markdown("#### Step 1: Check you're ready")
 with st.container(border=True):
     st.markdown(f"""
-Confirm all four before you start. If any fails, go back to **Getting Started**.
+Confirm all four before you start. If any fails, go back to **Module 0: Setup**.
 
 | Check | Where to look |
 |---|---|
@@ -182,10 +182,10 @@ with st.container(border=True):
     st.markdown("This builds both models in your schema and runs any tests (there are none yet; Module 2 adds them).")
     render_expected(f"Two `OK created` lines, for `{attendee_schema()}.customers` and `{attendee_schema()}.orders_summary`, then **`Done. PASS=2 WARN=0 ERROR=0 SKIP=0`**.")
     render_troubleshoot([
-        ("`Could not find profile named 'coco_de_guide'`", "Your `~/.dbt/profiles.yml` is missing the block. Redo Getting Started, Step 6."),
-        ("Output mentions `TPCH_TRANSFORMED`", f"`schema:` in `~/.dbt/profiles.yml` is still the guide's. Change it to `{attendee_schema()}`, save, and run again."),
+        ("`Could not find profile named 'coco_de_guide'`", "Your `~/.dbt/profiles.yml` is missing the block. Redo Module 0, Step 6."),
+        ("Output mentions `TPCH_TRANSFORMED`", f"`schema:` in `~/.dbt/profiles.yml` is still the example value. Change it to `{attendee_schema()}`, save, and run again."),
         ("`Compilation Error ... source named 'tpch'`", "`_sources.yml` was changed. Run `git checkout dbt/models/_sources.yml` and build again."),
-        ("`dbt: command not found`", "Close and reopen the terminal. Still missing: Getting Started, Step 2."),
+        ("`dbt: command not found`", "Close and reopen the terminal. Still missing: Module 0, Step 2."),
         ("The terminal isn't in the project folder", f"Run `cd` to your `{REPO_NAME}` folder first (the one containing `dbt/`)."),
     ])
 

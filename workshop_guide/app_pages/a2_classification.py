@@ -3,7 +3,7 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A2", "Sensitive Data Classification Sweep", "15 min", "classification-sweep subagent: classify new tables, propose tags and masking, route for approval")
 
-st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+st.caption("Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
 render_technologies_used([
     {"name": "SYSTEM$CLASSIFY", "description": "Samples a table's columns and recommends semantic categories (EMAIL, PHONE_NUMBER, DATE_OF_BIRTH...) and privacy categories (IDENTIFIER, QUASI_IDENTIFIER, SENSITIVE). Enterprise Edition.", "icon": "policy"},
@@ -13,7 +13,7 @@ render_technologies_used([
 
 st.markdown("""
 **The data:** 40 synthetic residents with names, emails, phones, birth dates, addresses, income, IP addresses, and free-text service notes. It's fake, but shaped like the real thing.
-It isn't part of the guide's dbt project, so load it once into your schema:
+It isn't part of the dbt project, so load it once into your schema:
 
 1. In CoCo Desktop, open **`part2/resident_contacts.sql`**.
 2. Change `XX` to the same initials you used in `scripts/setup.sql`:

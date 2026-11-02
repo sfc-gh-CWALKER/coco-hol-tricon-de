@@ -5,7 +5,7 @@ render_session_header("A5", "Anomaly Explanation", "10 min", "anomaly-explainer 
 
 st.caption("Builds on the SALES_KPI_VIEW semantic view from A4. Run Prompt A4.1 first if you skipped A4.")
 
-st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+st.caption("Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
 render_technologies_used([
     {"name": "Contribution analysis", "description": "Splits a metric's change across dimension members. Each member's delta divided by the total delta shows where the move came from.", "icon": "stacked_bar_chart"},

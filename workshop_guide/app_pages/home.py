@@ -52,7 +52,7 @@ st.markdown("#### Prerequisites")
 with st.container(border=True):
     st.markdown("""
 - Familiarity with dbt (models, sources, tests), Snowflake, and Git
-- **Getting Started** finished before lab day: CoCo Desktop, Git and dbt installed, your schema created with `scripts/setup.sql`, a PAT, and `dbt debug` passing
+- If you can, install **CoCo Desktop, Git and dbt** before the lab (Module 0, Step 2): installs can need IT approval. We do the rest of Module 0 together
 - Your initials, Snowflake username and account typed into the **sidebar**
 - Optional, for Module 4's CI/CD: a GitHub account to fork the repo
 - Optional, for modules A3 and A6: the `DEMO_REVIEWER` role (read-only account metadata)

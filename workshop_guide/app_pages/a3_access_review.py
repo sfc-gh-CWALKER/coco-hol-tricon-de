@@ -5,7 +5,7 @@ render_session_header("A3", "Monthly Access Review", "10 min", "access-review su
 
 st.info(":material/key: **Requires the `DEMO_REVIEWER` role** (read-only account metadata, granted by your admin). Without it, follow along with the facilitator's demo, or build the subagent now and run it later.")
 
-st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+st.caption("Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
 render_technologies_used([
     {"name": "ACCOUNT_USAGE views", "description": "USERS, ROLES, GRANTS_TO_USERS, GRANTS_TO_ROLES, and LOGIN_HISTORY. Account-wide security metadata, with up to about 2 hours of latency.", "icon": "admin_panel_settings"},

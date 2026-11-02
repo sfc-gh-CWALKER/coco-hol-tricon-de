@@ -183,15 +183,14 @@ def render_before_you_start(items: list[str]):
 
 
 def render_guide_change(original: str, tricon: str, why: str):
-    """Callout marking a deliberate difference from Jeremiah Hansen's original guide."""
-    with st.container(border=True):
-        st.markdown(":orange-badge[:material/edit_note: Workshop change]")
-        st.markdown(personalize(f"**Original guide:** {original}  \n**This workshop:** {tricon}  \n**Why:** {why}"))
+    """Facilitator-only note on a deliberate difference from Jeremiah Hansen's guide; collapsed so attendees aren't distracted."""
+    with st.expander(":gray[:material/info: Facilitator note]"):
+        st.caption(personalize(f"Original guide: {original}  \nThis workshop: {tricon}  \nWhy: {why}"))
 
 
 def render_same_as_guide(section: str):
-    """Marks a step that is word for word from the original guide (only your schema name is filled in)."""
-    st.caption(f":green-badge[:material/check: Same as the guide] Guide section: *{section}*")
+    """Steps that match the guide need no callout for attendees; kept so pages can still mark them in code."""
+    return
 
 
 def render_new_for_tricon(text: str):

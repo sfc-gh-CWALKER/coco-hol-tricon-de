@@ -17,13 +17,14 @@ with st.container(border=True):
         c1, c2 = st.columns([1, 6])
         c1.markdown(f"**{time}**")
         c2.markdown(f"{title} :gray-badge[{dur}]")
-st.caption("Finish the Getting Started readiness check before lab day; the plan has no time for installs.")
+st.caption("Install CoCo Desktop, Git and dbt before the lab if you can (Module 0, Step 2). We walk through the rest of setup together.")
 
 st.space("medium")
 
 st.markdown("#### Part 1: Engineering standards (everyone, ~90 min)")
 st.markdown("Follows Jeremiah Hansen's guide. You build the pieces that every Part 2 workflow reuses.")
 PART1 = [
+    ("0", "Set up together", "Fork and clone, your schema, PAT, and dbt profile", "15 min"),
     ("1", "Give CoCo your project context", "AGENTS.md and a conventions audit", "15 min"),
     ("2", "Turn a standard into a skill", "Schema tests, then a `new-dbt-model` skill", "20 min"),
     ("3", "Package it as a plugin", "Prod-safety hook and a `dbt-review` subagent", "25 min"),

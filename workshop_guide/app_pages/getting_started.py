@@ -18,13 +18,11 @@ from components import (
     setup_complete,
 )
 
-st.title("Getting Started")
+st.title("Module 0: Setup")
 st.markdown(f"""
-This page is the guide's **Setup** section ([Data Engineering with CoCo]({GUIDE_URL})), step by step.
-Finish it **before lab day**: installs can need IT approval.
+We'll do this together at the start of the lab. Work top to bottom: every step says what you should see, and if you see something else, open the **Fixes** box under it.
 
-The only change from the guide: everyone shares one Snowflake account, so each person builds in their **own schema**,
-`{LAB_DB}.TPCH_<INITIALS>`, instead of the guide's `{LAB_DB}.TPCH_TRANSFORMED`. Fill in the sidebar and every step below uses yours.
+Everyone shares one Snowflake account, so each person builds in their **own schema**, `{LAB_DB}.TPCH_<INITIALS>`. Type your initials in the sidebar and every step below uses yours.
 """)
 
 if not setup_complete():
@@ -184,9 +182,9 @@ with st.container(border=True):
     ])
 
 st.space("small")
-st.markdown("#### On lab day")
+st.markdown("#### Next")
 st.markdown(f"""
-- Open this app and check the sidebar still shows your details (they're kept in the page link, so bookmark it).
-- Keep CoCo Desktop open on the `{REPO_NAME}` folder with role `{LAB_ROLE}`, then start **Module 1**.
-- Stuck? **Help & Troubleshooting** in the menu, then the facilitator.
+- Keep CoCo Desktop open on the `{REPO_NAME}` folder with role `{LAB_ROLE}`, then go to **Module 1**.
+- Your sidebar initials are kept in the page link, so bookmark it.
+- Stuck? **Help & Troubleshooting** at the bottom of the menu, then the facilitator.
 """)

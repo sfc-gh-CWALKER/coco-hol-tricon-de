@@ -94,12 +94,10 @@ page = st.navigation(
     {
         "": [
             st.Page("app_pages/home.py", title="Home", icon=":material/home:"),
-            st.Page("app_pages/getting_started.py", title="Getting Started", icon=":material/rocket_launch:"),
             st.Page("app_pages/agenda.py", title="Agenda", icon=":material/calendar_today:"),
-            st.Page("app_pages/help.py", title="Help & Troubleshooting", icon=":material/support:"),
-            st.Page("app_pages/guide_mapping.py", title="Guide Mapping", icon=":material/compare_arrows:"),
         ],
         "Part 1: Data Engineering with CoCo (the guide)": [
+            st.Page("app_pages/getting_started.py", title="0. Setup", icon=":material/rocket_launch:"),
             st.Page("app_pages/m01_agents_md.py", title=_title("1", "AGENTS.md"), icon=":material/description:"),
             st.Page("app_pages/m02_skill.py", title=_title("2", "Tests & Custom Skill"), icon=":material/auto_fix_high:"),
             st.Page("app_pages/m03_plugin.py", title=_title("3", "Plugin, Hook & Subagent"), icon=":material/extension:"),
@@ -113,6 +111,10 @@ page = st.navigation(
             st.Page("app_pages/a5_anomaly.py", title=_title("A5", "Anomaly Explanation"), icon=":material/troubleshoot:"),
             st.Page("app_pages/a6_warehouses.py", title=_title("A6", "Warehouse Right-Sizing"), icon=":material/speed:"),
             st.Page("app_pages/a7_schedule.py", title="A7. Put It on a Schedule", icon=":material/event_repeat:"),
+        ],
+        "Reference": [
+            st.Page("app_pages/help.py", title="Help & Troubleshooting", icon=":material/support:"),
+            st.Page("app_pages/guide_mapping.py", title="Guide Mapping", icon=":material/compare_arrows:"),
         ],
     },
     position="sidebar",

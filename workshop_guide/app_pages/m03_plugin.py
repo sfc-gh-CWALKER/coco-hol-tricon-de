@@ -11,7 +11,7 @@ render_technologies_used([
 
 render_before_you_start([
     "Module 2 is done: `supplier_performance` built with the `new-dbt-model` skill.",
-    "**Windows:** Git for Windows is installed (Getting Started, Step 2). Hooks run with its `bash`.",
+    "**Windows:** Git for Windows is installed (Module 0, Step 2). Hooks run with its `bash`.",
     "Start a **new chat** for this module.",
 ])
 

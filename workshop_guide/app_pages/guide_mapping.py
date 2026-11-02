@@ -24,11 +24,11 @@ st.markdown(f"""
 | Original guide section | This workshop | Status |
 |---|---|---|
 | Overview / What is Cortex Code? | Home | Condensed |
-| Setup: fork and clone | Getting Started, Step 1 | :orange-badge[Workshop change] Fork [the workshop copy]({REPO_URL}) of the guide repo |
-| Setup: configure CoCo Desktop | Getting Started, Step 3 | :green-badge[Same] |
-| Setup: run `scripts/setup.sql` | Getting Started, Step 4 | :orange-badge[Workshop change] Admin creates the shared role, warehouse and database once (`scripts/admin_setup.sql`); you set `MY_INITIALS` and run `setup.sql` to create your schema |
-| Setup: create a PAT | Getting Started, Step 5 | :green-badge[Same] The network-policy bypass moves to Module 4 and needs admin approval |
-| Setup: configure dbt / `dbt debug` | Getting Started, Steps 6–7 | :orange-badge[Workshop change] `schema: TPCH_<INITIALS>`; the app fills in your block |
+| Setup: fork and clone | Module 0, Step 1 | :orange-badge[Workshop change] Fork [the workshop copy]({REPO_URL}) of the guide repo |
+| Setup: configure CoCo Desktop | Module 0, Step 3 | :green-badge[Same] |
+| Setup: run `scripts/setup.sql` | Module 0, Step 4 | :orange-badge[Workshop change] Admin creates the shared role, warehouse and database once (`scripts/admin_setup.sql`); you set `MY_INITIALS` and run `setup.sql` to create your schema |
+| Setup: create a PAT | Module 0, Step 5 | :green-badge[Same] The network-policy bypass moves to Module 4 and needs admin approval |
+| Setup: configure dbt / `dbt debug` | Module 0, Steps 6–7 | :orange-badge[Workshop change] `schema: TPCH_<INITIALS>`; the app fills in your block |
 | Create an AGENTS.md | Module 1, Prompts 1.1–1.2 | :green-badge[Same] with `schema (TPCH_<INITIALS>)` |
 | Using CoCo Without a Skill | Module 2, Prompt 2.1 | :green-badge[Same] |
 | Create a Custom Skill | Module 2, Prompts 2.2–2.3 | :green-badge[Same] |

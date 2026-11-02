@@ -21,7 +21,7 @@ st.markdown(f"""
 | *Role '{LAB_ROLE}' ... not authorized* or not in the role list | Your admin hasn't granted it to your username yet (`scripts/admin_setup.sql`). Send them the username from Snowsight → your name → Profile |
 | *Account not found* | Use `orgname-accountname` from Snowsight → your name → *Connect a tool to Snowflake* |
 | *Incorrect username or password* from dbt | `password:` in `~/.dbt/profiles.yml` must be the PAT itself, in quotes |
-| *Network policy is required* / *IP not allowed* | Connect to the company VPN, or switch the profile to `authenticator: externalbrowser` (Getting Started, Step 6) |
+| *Network policy is required* / *IP not allowed* | Connect to the company VPN, or switch the profile to `authenticator: externalbrowser` (Module 0, Step 6) |
 | CoCo Desktop: *access blocked* or no replies | CoCo may not be enabled for your user yet. Send the error to your admin |
 """)
 
@@ -29,12 +29,12 @@ st.markdown("#### dbt")
 st.markdown(f"""
 | If you see | Do this |
 |---|---|
-| `Could not find profile named 'coco_de_guide'` | Add the `coco_de_guide` block to `~/.dbt/profiles.yml` (Getting Started, Step 6) |
+| `Could not find profile named 'coco_de_guide'` | Add the `coco_de_guide` block to `~/.dbt/profiles.yml` (Module 0, Step 6) |
 | `<...>` placeholders in an error | Fill in the sidebar, then copy the Step 6 block again |
 | *Schema '{LAB_DB}.TPCH_..' does not exist* | Run `scripts/setup.sql` with your initials, and use the same initials in `profiles.yml` |
 | Tables appear in `TPCH_TRANSFORMED` or someone else's schema | Your `schema:` line isn't `{attendee_schema()}`. Fix it, then `dbt build` again |
 | *Object 'SNOWFLAKE_SAMPLE_DATA...' does not exist* | Ask your admin to run the sample-data grant in `scripts/admin_setup.sql` |
-| `dbt: command not found` | Close and reopen the terminal (and CoCo Desktop). Then Getting Started, Step 2 |
+| `dbt: command not found` | Close and reopen the terminal (and CoCo Desktop). Then Module 0, Step 2 |
 | *Warehouse '{LAB_WH}' ... queued* for a long time | 30 people are building at once. Wait, or ask the admin to size `{LAB_WH}` up for the session |
 | A test fails on `order_status` | TPC-H statuses are **F, O, P**. In Module 2, fix the test; in Module A1, that failure is the point |
 """)

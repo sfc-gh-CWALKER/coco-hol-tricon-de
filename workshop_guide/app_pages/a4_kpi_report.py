@@ -3,7 +3,7 @@ from components import render_session_header, render_prompt, render_explanation,
 
 render_session_header("A4", "Recurring KPI Report", "15 min", "Semantic view over your dbt models + kpi-report subagent publishing HTML (and optional email)")
 
-st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+st.caption("Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
 render_technologies_used([
     {"name": "Semantic view", "description": "Business definitions (metrics, dimensions, relationships) as a Snowflake object, so every report uses the same math.", "icon": "description"},

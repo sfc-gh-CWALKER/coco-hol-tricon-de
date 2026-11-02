@@ -5,7 +5,7 @@ render_session_header("A6", "Warehouse Right-Sizing & Adaptive Warehouses", "15 
 
 st.info(":material/key: **Requires the `DEMO_REVIEWER` role** (usage and query-history metadata). Changing a warehouse stays with Tricon's Snowflake admin.")
 
-st.markdown(":blue-badge[:material/add_circle: New for Tricon] Not in the original guide. Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
+st.caption("Built on the same AGENTS.md, skill, and subagent pattern from Part 1.")
 
 render_technologies_used([
     {"name": "Usage & load history", "description": "WAREHOUSE_METERING_HISTORY (credits), WAREHOUSE_LOAD_HISTORY (queueing), and QUERY_HISTORY (spilling, queue time, duration).", "icon": "monitoring"},
