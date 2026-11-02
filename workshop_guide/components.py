@@ -62,8 +62,14 @@ def attendee_schema() -> str:
     return f"TPCH_{attendee_initials() or INITIALS_PLACEHOLDER}"
 
 
+def attendee_pat() -> str:
+    """Typed into a masked sidebar field; never persisted to the URL and only used in the dbt profile."""
+    return st.session_state.get("pat", "").strip()
+
+
 def profiles_yml() -> str:
     """The guide's ~/.dbt/profiles.yml block with this attendee's values filled in."""
+    password = attendee_pat() or "<YOUR_PERSONAL_ACCESS_TOKEN>"
     return f"""coco_de_guide:
   target: dev
   outputs:
@@ -71,7 +77,7 @@ def profiles_yml() -> str:
       type: snowflake
       account: "{attendee_account()}"
       user: "{attendee_user()}"
-      password: "<YOUR_PERSONAL_ACCESS_TOKEN>"
+      password: "{password}"
       role: {LAB_ROLE}
       database: {LAB_DB}
       warehouse: {LAB_WH}

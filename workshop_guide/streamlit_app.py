@@ -54,7 +54,7 @@ st.logo(
 
 with st.sidebar:
     st.markdown("**Your initials**")
-    st.caption("The only thing you need to type. It fills in your schema in every script and prompt. Use the same initials in scripts/setup.sql. Nothing is sent or saved; never type a password or token here.")
+    st.caption("The only thing you need to type. It fills in your schema in every script and prompt. Use the same initials in scripts/setup.sql. Nothing is saved.")
     st.text_input(
         "Your initials",
         key="initials",
@@ -85,6 +85,16 @@ with st.sidebar:
             help="Fills in the clone command for your fork (needed for Module 4 CI/CD).",
             on_change=_sync_to_url,
         )
+    with st.expander("Optional: your Personal Access Token"):
+        st.caption("Fills in the `password:` line of your dbt profile (Module 0, Step 6), so you can copy it whole. It's masked, isn't added to the page link, isn't saved, and is gone when you close this tab. You can skip this and paste the token into the file yourself.")
+        st.text_input(
+            "Personal Access Token (DEMO_PAT)",
+            key="pat",
+            type="password",
+            placeholder="Paste your DEMO_PAT",
+        )
+        if st.session_state.get("pat", "").strip():
+            st.caption(":green[:material/check: Token added to your dbt profile.]")
     if setup_complete():
         st.success(f"Your schema everywhere: **`{LAB_DB}.{attendee_schema()}`**", icon=":material/check_circle:")
     else:

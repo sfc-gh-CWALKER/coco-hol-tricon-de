@@ -137,10 +137,11 @@ with st.container(border=True):
 In Snowsight: your name (bottom left) → **Settings** → **Authentication** → **Programmatic access tokens** → **Generate new token**:
 
 - **Name**: `DEMO_PAT`
-- **Expires in**: default (15 days)
+- **Expires in**: **7 days**
 - **Grant access**: **Single role** → `{LAB_ROLE}`
 
 **Copy the token now**; you can't see it again. Tokens belong to your user, so everyone can name theirs `DEMO_PAT`.
+Optional: paste it into **Your Personal Access Token** in the sidebar, and Step 6's profile fills it in for you.
 """)
     st.info(":material/lock: The guide also runs `ALTER USER ... SET MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT = 60` here, so GitHub Actions can connect. **Skip that on a company account.** It's only needed for Module 4's CI/CD, which covers what to do instead.")
     render_troubleshoot([
@@ -155,7 +156,7 @@ with st.container(border=True):
     st.markdown("dbt looks for `~/.dbt/profiles.yml`. If you don't have one yet, copy the example file. Run this in the CoCo Desktop terminal (it opens in the project folder):")
     render_code("""mkdir -p ~/.dbt
 cp dbt/profiles.yml.example ~/.dbt/profiles.yml""")
-    st.markdown("Open `~/.dbt/profiles.yml` (`CMD/CTRL+P`) and make the `coco_de_guide` block look like this. Fill in **account** and **user** from the row `setup.sql` printed in Step 4, and paste your token over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
+    st.markdown("Open `~/.dbt/profiles.yml` (`CMD/CTRL+P`) and make the `coco_de_guide` block look like this. Fill in **account** and **user** from the row `setup.sql` printed in Step 4. If you didn't add your token in the sidebar, paste it over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
     render_code(profiles_yml(), language="yaml")
     st.caption("If you already have a `~/.dbt/profiles.yml`, add this `coco_de_guide` block alongside your other profiles; they don't conflict. The file lives outside the repo, so your token can't be committed.")
     render_guide_change(
