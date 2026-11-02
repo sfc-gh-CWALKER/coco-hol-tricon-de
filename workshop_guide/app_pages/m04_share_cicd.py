@@ -71,7 +71,7 @@ with st.container(border=True):
 
 | Path | When | What you do |
 |---|---|---|
-| **A. Hands-on CI** | Your admin ran `scripts/admin_ci_network.sql`, or the account has no network policy | Steps 1–4 below |
+| **A. Hands-on CI** | Your admin ran `scripts/admin_setup.sql` with `CI_PATH_A = 'YES'`, or the account has no network policy | Steps 1–4 below |
 | **B. Laptop fallback** | GitHub's runners aren't allowed in | Steps 2 and 4 (to see the workflow and open the PR), then **Step 5**: the same review, run headless from your laptop |
 """)
 
@@ -162,7 +162,7 @@ render_guide_change(
     "Keeps every attendee's PR and CI run in their own fork.")
 render_troubleshoot([
     ("No workflow run appears", "Actions aren't enabled on your fork (Step 3), or the PR doesn't touch `dbt/models/**`. Use **Run workflow** on the Actions tab to trigger it manually."),
-    ("Red run: *IP ... is not allowed to access Snowflake*", "The network policy blocks GitHub's runner. Your admin needs `scripts/admin_ci_network.sql` with your username in it; until then, use path B (Step 5)."),
+    ("Red run: *IP ... is not allowed to access Snowflake*", "The network policy blocks GitHub's runner. Your admin needs to run `scripts/admin_setup.sql` with `CI_PATH_A = 'YES'` and your username in `ATTENDEES`; until then, use path B (Step 5)."),
     ("Red run: *No PASS/FAIL verdict*, review says Bash is blocked or no dbt-review agent", "The `cortex` step is missing `--plugin-dir .cortex/plugins/coco-de-guide` or `--allowed-tools`. Compare with `part2/solutions/github-workflows/pr-review.yml`."),
     ("Green run but the comment is just the heading", "You have the guide's original workflow (`2>/dev/null || true` hides errors). Re-run Prompt 4.1 or copy the tested workflow."),
     ("dbt build fails in CI with *profile not found* or *schema*", "The `SNOWFLAKE_SCHEMA` secret is missing or misspelled (Step 1)."),
