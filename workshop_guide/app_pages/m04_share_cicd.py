@@ -77,15 +77,20 @@ In **your fork** on GitHub: **Settings → Secrets and variables → Actions →
 """)
 
 st.warning(f"""
-:material/lock: **GitHub's runners connect from outside your company network.** If your account has a network policy, the PAT is blocked from GitHub unless the policy allows it.
-The guide uses a 60-minute bypass:
+:material/lock: **GitHub's runners connect from outside your company network.** If your account has a network policy (most company accounts do), Snowflake blocks the runner and the workflow posts an **empty** review.
+The guide's 60-minute PAT bypass doesn't help in that case: it only skips the *requirement* to have a network policy, not the policy itself.
+
+**Before the lab, your Snowflake admin chooses one:**
+- add a network rule that allows GitHub-hosted runners to the policy for a CI user, or
+- run the workflow on a self-hosted runner inside the company network, or
+- skip hands-on CI and watch the facilitator's demo.
+
+The 60-minute bypass below only applies to accounts with **no** network policy:
 
 ```sql
 ALTER USER {attendee_user()} MODIFY PROGRAMMATIC ACCESS TOKEN DEMO_PAT
   SET MINS_TO_BYPASS_NETWORK_POLICY_REQUIREMENT = 60;
 ```
-
-**Run this only if your Snowflake admin approves it.** Otherwise the workflow runs but the review step can't connect, and the facilitator demos a working run. The long-term setup is a CI service user with a network policy that allows GitHub's runners, or a self-hosted runner inside your network.
 """)
 
 st.markdown("##### Step 2: Create the GitHub Actions workflow")
@@ -130,16 +135,19 @@ st.markdown("""
 render_code("Add AGENTS.md, custom skill, plugin, and CI workflow", language="text")
 st.markdown("""
 3. **Push:** click **Publish Branch**.
-4. **Open a pull request** on GitHub from `feature/add-coco-plugin` into **your fork's** `main`. GitHub defaults the base to the upstream repository; change it to your fork.
+4. **Open a pull request** on GitHub from `feature/add-coco-plugin` into **your fork's** `main`.
+
+   :red[**Change the base repository.**] GitHub defaults it to the workshop repo you forked from. Set *base repository* to `<YOUR_GITHUB_USERNAME>/sfguide-data-engineering-with-coco`, or your PR lands in everyone's shared repo.
 5. Watch the **Actions** tab. When it finishes, the dbt-review PASS/FAIL report is in the logs and posted as a PR comment.
 """)
+render_expected("A green Actions run **and** a PR comment with a PASS/FAIL table. A green run with an **empty** comment means CI couldn't connect to Snowflake (see the fixes below), not that the review passed.")
 render_guide_change(
     "Open the PR against your fork of `Snowflake-Labs/sfguide-data-engineering-with-coco`.",
     "Your fork's upstream is the workshop repo, so GitHub defaults the base to the workshop repo. Change the base to your own fork the same way.",
     "Keeps every attendee's PR and CI run in their own fork.")
 render_troubleshoot([
     ("No workflow run appears", "Actions aren't enabled on your fork (Step 3), or the PR doesn't touch `dbt/models/**`. Use **Run workflow** on the Actions tab to trigger it manually."),
-    ("The PR comment says *No review output produced*", "The CLI couldn't connect. Most often the network policy blocks GitHub's runners (see the warning in Step 1), or a secret has a typo. Check the *Run Cortex Code* step's log."),
+    ("The PR comment is just the heading, or says *No review output produced*", "The run is green, but CoCo CLI couldn't connect: the workflow's `2>/dev/null || true` hides the error. On a company account this is almost always the network policy blocking GitHub's runner (Snowflake login history shows `390422 INCOMING_REQUEST_BLOCKED`). See the warning in Step 1. Otherwise check the three secrets for typos."),
     ("*Resource not accessible by integration* when posting the comment", "The workflow needs `pull-requests: write`. Ask CoCo to add it to `permissions:`."),
     ("The PR opened against the workshop repo", "Close it, and open a new one with base repository = your fork."),
 ])

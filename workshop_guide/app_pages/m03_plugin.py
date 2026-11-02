@@ -186,14 +186,10 @@ PROMPT_3_5 = """Use the dbt-review agent to review the changes in this branch.""
 
 render_prompt("Prompt 3.5", "Run the Subagent Locally", PROMPT_3_5)
 render_expected("CoCo starts the **dbt-review** subagent, builds each changed model (`orders_summary`, `supplier_performance`) and returns a PASS/FAIL table per convention, ending with an overall **PASS**.")
+st.info(""":material/info: **If it says there are no changes:** that's expected at this point. The subagent compares with `origin/main`, and you haven't committed anything yet (that's Module 4). Send this instead:
 
-render_explanation("If dbt-review finds no changes", """
-The subagent compares your work with `origin/main`. Your files aren't committed yet (that happens in Module 4), so ask it to include them:
-
-*Use the dbt-review agent to review the changes in this branch, including uncommitted and untracked files.*
-
-If it says `origin/main` is unknown (you downloaded a ZIP instead of cloning), ask: *Review all models in dbt/models instead of diffing.*
-""")
+*Use the dbt-review agent to review the changes in this branch, including uncommitted and untracked files.*""")
+st.caption("If it says `origin/main` is unknown (you downloaded a ZIP instead of cloning), ask: *Review all models in dbt/models instead of diffing.*")
 
 render_key_concepts([
     {"term": "Why hooks matter", "definition": "Agents generate content dynamically, and that non-determinism doesn't belong in a production pipeline. A hook enforces the boundary no matter what the agent decides."},
