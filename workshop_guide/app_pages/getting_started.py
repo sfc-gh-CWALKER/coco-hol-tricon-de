@@ -74,6 +74,17 @@ dbt --version""")
 uv tool install --python 3.12 dbt-core --with dbt-snowflake
 dbt --version""", language="powershell")
     render_expected("`dbt --version` lists **Core 1.10 or newer** and **Plugins: snowflake**.")
+    with st.expander(":material/cloud: Using dbt Cloud at work? Install dbt Core for this lab anyway"):
+        st.markdown("""
+This lab needs **dbt Core on your laptop**, even if your team runs dbt Cloud day to day:
+
+- CoCo Desktop works on the files in your cloned folder and runs `dbt build` in its local terminal. The skill, the prod-safety hook, and the dbt-review subagent all depend on that.
+- The **dbt Cloud IDE** (in the browser) can't be driven by CoCo: the files aren't on your laptop.
+- The **dbt Cloud CLI** might work, but it needs a dbt Cloud project, a development schema, and a seat for each person, and it hasn't been tested with this lab.
+
+dbt Core is free, installs with the two commands above, and doesn't touch your dbt Cloud projects or jobs.
+Everything you build (`AGENTS.md`, skills, the plugin, review subagents) carries over to your real projects, as long as they're in a Git repo you can clone.
+""")
     render_troubleshoot([
         ("`dbt: command not found`", "Close **all** terminals (and CoCo Desktop) and reopen. Still missing: `uv tool update-shell`, then reopen."),
         ("Installer blocked by IT", "With any Python 3.10–3.13: `python3 -m pip install --user dbt-core dbt-snowflake`. Don't use macOS's built-in Python 3.9."),
