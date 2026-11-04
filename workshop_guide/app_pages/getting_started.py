@@ -58,7 +58,7 @@ with st.container(border=True):
 |---|---|
 | **CoCo Desktop** | [Download](https://www.snowflake.com/en/product/snowflake-coco/downloads/) · Windows: the **User installer** needs no admin rights |
 | **Git** | macOS: run `git --version` (it offers to install). Windows: [Git for Windows](https://git-scm.com/download/win), keep the defaults (includes **Git Bash**, used by the Module 3 hook) |
-| **dbt Core + dbt-snowflake** | The commands below. `uv` brings its own Python, so your system Python doesn't matter |
+| **dbt** | The commands below. `uv` brings its own Python, so you don't need Python installed |
 """)
     tab_mac, tab_win = st.tabs(["macOS", "Windows (PowerShell)"])
     with tab_mac:
@@ -67,11 +67,16 @@ with st.container(border=True):
 uv tool install --python 3.12 dbt-core --with dbt-snowflake
 dbt --version""")
     with tab_win:
+        st.caption("Use **PowerShell**, not Command Prompt. Run the lines after the first one in the **same** PowerShell window: the `$env:` setting only lasts for that window.")
         render_code("""powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 # close and reopen PowerShell, then:
-uv tool install --python 3.12 dbt-core --with dbt-snowflake
+$env:UV_SYSTEM_CERTS = "1"    # trust the company network's certificates (older uv: $env:UV_NATIVE_TLS = "1")
+uv tool install dbt
+uv tool update-shell          # puts dbt on your PATH
+# close and reopen PowerShell, then:
 dbt --version""", language="powershell")
-    render_expected("`dbt --version` lists **Core 1.10 or newer** and **Plugins: snowflake**.")
+        st.caption("This installs **dbt v2**, which has Snowflake support built in, so there's no separate `dbt-snowflake` plugin. On a corporate network, the certificate line is what makes the download work.")
+    render_expected("macOS: `dbt --version` lists **Core 1.10 or newer** and **Plugins: snowflake**. Windows: `dbt --version` prints a **2.x** version.")
     with st.expander(":material/cloud: Using dbt Cloud at work? Install dbt Core for this lab anyway"):
         st.markdown("""
 This lab needs **dbt Core on your laptop**, even if your team runs dbt Cloud day to day:
@@ -80,13 +85,15 @@ This lab needs **dbt Core on your laptop**, even if your team runs dbt Cloud day
 - The **dbt Cloud IDE** (in the browser) can't be driven by CoCo: the files aren't on your laptop.
 - The **dbt Cloud CLI** might work, but it needs a dbt Cloud project, a development schema, and a seat for each person, and it hasn't been tested with this lab.
 
-dbt Core is free, installs with the two commands above, and doesn't touch your dbt Cloud projects or jobs.
+dbt is free, installs with the commands above, and doesn't touch your dbt Cloud projects or jobs.
 Everything you build (`AGENTS.md`, skills, the plugin, review subagents) carries over to your real projects, as long as they're in a Git repo you can clone.
 """)
     render_troubleshoot([
-        ("`dbt: command not found`", "Close **all** terminals (and CoCo Desktop) and reopen. Still missing: `uv tool update-shell`, then reopen."),
+        ("`dbt: command not found` / *dbt is not recognized*", "Close **all** terminals (and CoCo Desktop) and reopen. Still missing: `uv tool update-shell`, then reopen."),
+        ("Windows: *certificate verify failed*, *invalid peer certificate* or *UnknownIssuer*", "The company network inspects HTTPS traffic. In the same PowerShell window, run `$env:UV_SYSTEM_CERTS = \"1\"`, then `uv tool install dbt` again."),
+        ("Windows: uv warns that `UV_NATIVE_TLS` is deprecated", "Harmless. Use `$env:UV_SYSTEM_CERTS = \"1\"` instead, which is the new name."),
         ("Installer blocked by IT", "With any Python 3.10–3.13: `python3 -m pip install --user dbt-core dbt-snowflake`. Don't use macOS's built-in Python 3.9."),
-        ("No **snowflake** plugin listed", "`uv tool install --force --python 3.12 dbt-core --with dbt-snowflake`"),
+        ("macOS: no **snowflake** plugin listed", "`uv tool install --force --python 3.12 dbt-core --with dbt-snowflake`"),
     ])
 
 # ---------------------------------------------------------------- Step 3
@@ -153,10 +160,25 @@ Optional: paste it into **Your Personal Access Token** in the sidebar, and Step 
 st.markdown("#### Step 6: Configure dbt")
 with st.container(border=True):
     render_same_as_guide("Setup → Configure dbt")
-    st.markdown("dbt looks for `~/.dbt/profiles.yml`. If you don't have one yet, copy the example file. Run this in the CoCo Desktop terminal (it opens in the project folder):")
-    render_code("""mkdir -p ~/.dbt
-cp dbt/profiles.yml.example ~/.dbt/profiles.yml""")
-    st.markdown("Open `~/.dbt/profiles.yml` (`CMD/CTRL+P`) and make the `coco_de_guide` block look like this. Fill in **account** and **user** from the row `setup.sql` printed in Step 4. If you didn't add your token in the sidebar, paste it over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
+    st.markdown(
+        "dbt reads its connection settings from `profiles.yml` in a `.dbt` folder in your **home folder**, "
+        "not in the project folder. That's expected: it keeps your token out of the repo.\n\n"
+        "- Windows: `C:\\Users\\<you>\\.dbt\\profiles.yml`\n"
+        "- macOS: `/Users/<you>/.dbt/profiles.yml`\n\n"
+        f"Run these in the CoCo Desktop terminal, from the `{REPO_NAME}` folder (the terminal opens there). "
+        "The copy reads the example from the project and writes it to your home folder.")
+    tab_win, tab_mac = st.tabs(["Windows (PowerShell)", "macOS / Linux"])
+    with tab_win:
+        st.caption("Use **PowerShell**, not Command Prompt (cmd). In Command Prompt `~` and `cp` don't work.")
+        render_code("""New-Item -ItemType Directory -Force "$HOME\\.dbt" | Out-Null
+Copy-Item dbt\\profiles.yml.example "$HOME\\.dbt\\profiles.yml"
+notepad "$HOME\\.dbt\\profiles.yml\"""", language="powershell")
+    with tab_mac:
+        render_code("""mkdir -p ~/.dbt
+cp dbt/profiles.yml.example ~/.dbt/profiles.yml
+open -e ~/.dbt/profiles.yml""")
+    st.caption("The last line opens the file in Notepad / TextEdit. `CMD/CTRL+P` in CoCo Desktop won't find it: Ctrl+P only searches the project folder, and this file is outside it.")
+    st.markdown("Make the `coco_de_guide` block look like this, then save. Fill in **account** and **user** from the row `setup.sql` printed in Step 4. If you didn't add your token in the sidebar, paste it over `<YOUR_PERSONAL_ACCESS_TOKEN>`:")
     render_code(profiles_yml(), language="yaml")
     st.caption("If you already have a `~/.dbt/profiles.yml`, add this `coco_de_guide` block alongside your other profiles; they don't conflict. The file lives outside the repo, so your token can't be committed.")
     render_guide_change(
@@ -175,6 +197,8 @@ with st.container(border=True):
     render_expected("`Connection test: [OK connection ok]` and **`All checks passed!`**")
     render_troubleshoot([
         ("`Could not find profile named 'coco_de_guide'`", "The block isn't in `~/.dbt/profiles.yml`, or the top-level name is different. Redo Step 6."),
+        ("`Could not find profile` on Windows, or a folder named `~` or `-p` appeared in the project", "The Step 6 commands ran in Command Prompt. Delete those folders, open a PowerShell terminal, and run the Windows commands in Step 6."),
+        ("`Copy-Item` / `cp`: cannot find `dbt\\profiles.yml.example`", f"The terminal isn't in the `{REPO_NAME}` folder. Run `cd` to that folder (where you cloned it in Step 1) and try again."),
         ("*Incorrect username or password*", "Paste the PAT itself (a long string) as `password:`, in quotes, and check `user:` matches your username."),
         (f"*Role '{LAB_ROLE}' specified in the connect string is not granted*", "The PAT was created for a different role. Create a new one with *Single role* → " + LAB_ROLE + "."),
         (f"*Schema '{LAB_DB}.TPCH_..' does not exist*", "Step 4 didn't run, or the initials in `profiles.yml` differ from the ones in `setup.sql`."),
