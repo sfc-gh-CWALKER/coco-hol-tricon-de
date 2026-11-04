@@ -15,6 +15,7 @@ from components import (
     attendee_schema,
     attendee_user,
     is_session_complete,
+    raw_initials,
     setup_complete,
 )
 
@@ -59,9 +60,9 @@ with st.sidebar:
         "Your initials",
         key="initials",
         max_chars=4,
-        placeholder="e.g. CW",
+        placeholder="e.g. CJW",
         label_visibility="collapsed",
-        help="2-4 letters. They name your own schema, TPCH_<initials>. If setup.sql says they're taken, add a letter and use the new initials here too. Press Enter to apply.",
+        help="Use 3 letters: first, middle and last initial (2-4 letters, no digits or spaces). They name your own schema, TPCH_<initials>. If setup.sql says they're taken, add a letter and use the new initials here too. Press Enter to apply.",
         on_change=_sync_to_url,
     )
     with st.expander("Optional: pre-fill everything else"):
@@ -97,8 +98,10 @@ with st.sidebar:
             st.caption(":green[:material/check: Token added to your dbt profile.]")
     if setup_complete():
         st.success(f"Your schema everywhere: **`{LAB_DB}.{attendee_schema()}`**", icon=":material/check_circle:")
+    elif raw_initials():
+        st.error("Initials must be 2-4 letters only (no digits, spaces or full names), e.g. CJW. Use exactly the same value in scripts/setup.sql.", icon=":material/error:")
     else:
-        st.warning("Type your initials so every step is ready to copy.", icon=":material/edit:")
+        st.warning("Type your initials (3 letters, e.g. CJW) so every step is ready to copy.", icon=":material/edit:")
 
 page = st.navigation(
     {

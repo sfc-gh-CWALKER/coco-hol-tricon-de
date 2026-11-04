@@ -1,3 +1,4 @@
+import re
 import streamlit as st
 
 # Prompt ids per module; a module shows a check in the sidebar once all are done.
@@ -36,8 +37,17 @@ GITHUB_PLACEHOLDER = "<YOUR_GITHUB_USERNAME>"
 PERSISTED_KEYS = ("initials", "sf_user", "sf_account", "gh_user")
 
 
+def raw_initials() -> str:
+    return st.session_state.get("initials", "").strip().upper()
+
+
+def initials_valid() -> bool:
+    """Same rule as scripts/setup.sql: 2-4 letters, nothing else."""
+    return bool(re.fullmatch(r"[A-Z]{2,4}", raw_initials()))
+
+
 def attendee_initials() -> str:
-    return "".join(c for c in st.session_state.get("initials", "") if c.isalpha()).upper()
+    return raw_initials() if initials_valid() else ""
 
 
 def attendee_account() -> str:
@@ -54,7 +64,7 @@ def attendee_github() -> str:
 
 def setup_complete() -> bool:
     """Initials are the only required input; username and account are optional pre-fills."""
-    return len(attendee_initials()) >= 2
+    return initials_valid()
 
 
 def attendee_schema() -> str:
