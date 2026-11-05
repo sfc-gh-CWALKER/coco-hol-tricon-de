@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("A7: Put It on a Schedule")
-st.markdown("You now have the workflows. Here's how each could run on its own, with the approval step kept in place. Treat this as a discussion for hackathon week; pick one and pilot it.")
+st.markdown("You now have the workflows. Here's how each could run on its own, with the approval step kept in place. Treat this as a discussion for Build Week; pick one and pilot it.")
 
 st.space("small")
 
@@ -43,7 +43,7 @@ with st.container(border=True):
 """)
 
 st.space("small")
-st.markdown("#### Hackathon ideas")
+st.markdown("#### Build Week ideas")
 st.markdown("""
 - Point `kpi-report` at a Tricon occupancy and rent-growth semantic view and reconcile it with Power BI.
 - Turn `dbt-test-triage` into a nightly GitHub Action for the India team's dbt project.

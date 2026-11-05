@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("Agenda")
-st.markdown("A 2.5-hour guided lab. Everyone does Part 1 hands-on (Jeremiah Hansen's guide). Part 2 is optional: the facilitator showcases each workflow live, and you can try them yourself if you have time. Any workflow can become your afternoon hackathon project.")
+st.markdown("A 2.5-hour guided lab. Everyone does Part 1 hands-on (Jeremiah Hansen's guide). Part 2 is optional: the facilitator showcases each workflow live, and you can try them yourself if you have time. Any workflow can become your Build Week project.")
 
 st.space("small")
 
@@ -39,7 +39,7 @@ with st.container(border=True):
 st.space("medium")
 
 st.markdown("#### Part 2: Automating Tricon's workflows (optional: showcased live, try them if you have time)")
-st.markdown("These are the tasks Tricon asked to automate, grouped the same way. If there's no time to build them in the lab, treat them as hackathon ideas.")
+st.markdown("These are the tasks Tricon asked to automate, grouped the same way. If there's no time to build them in the lab, treat them as Build Week ideas.")
 
 PART2 = [
     ("Data engineering", [
